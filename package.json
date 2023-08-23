@@ -10,12 +10,23 @@
   },
   "dependencies": {
     "@popperjs/core": "^2.11.8",
+    "@types/uuid": "^9.0.2",
+    "axios": "^1.4.0",
     "bootstrap": "^5.3.1",
-    "vue": "^3.3.4"
+    "bootstrap-icons": "^1.10.5",
+    "pinia": "^2.1.6",
+    "sockjs-client": "^1.6.1",
+    "uuid": "^9.0.0",
+    "vue": "^3.3.4",
+    "vue-router": "^4.2.4",
+    "vue-toast-notification": "^3.1.1",
+    "webstomp-client": "^1.2.6"
   },
   "devDependencies": {
     "@types/bootstrap": "^5.2.6",
     "@types/node": "^20.5.0",
+    "@types/socket.io": "^3.0.2",
+    "@types/sockjs-client": "^1.5.1",
     "@vitejs/plugin-vue": "^4.2.3",
     "sass": "^1.66.0",
     "typescript": "^5.0.2",
