@@ -3,11 +3,13 @@ import {CONFIG} from "../config.ts";
 
 const GameService = {
     async createGame() {
-        const {data, status} = await axios.post<Game>(`${CONFIG.API_URL}/games`)
+        // @ts-ignore
+        const {data, _status} = await axios.post<Game>(`${CONFIG.API_URL}/games`)
         return data
     },
 
-    async getGame(gameId: String) {
+    async getGame(gameId: string) {
+        // @ts-ignore
         const {data, status} = await axios.get<Game>(`${CONFIG.API_URL}/games/${gameId}`)
         return data
     },
@@ -15,26 +17,26 @@ const GameService = {
 }
 
 export interface Game {
-    id: String,
-    status: String,
+    id: string,
+    status: string,
     players: Array<Player>,
 }
 
 export interface Player {
-    id: String,
-    name: String,
+    id: string,
+    name: string,
     points: number,
     didBet: boolean,
     isActive: boolean
 }
 
 export interface JoinGameResponse {
-    playerId: String
+    playerId: string
 }
 
 export interface Task {
     id: number,
-    type: String,
+    type: string,
     content: string
 }
 

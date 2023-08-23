@@ -44,7 +44,7 @@ const betAmount = ref<number>(1)
 const betResult = ref<string>('')
 
 const currentPlayerJoined = ref(false)
-const notRepliedRequests = ref([])
+const notRepliedRequests = ref<string[]>([])
 function deleteFromNotRepliedRequests(requestId: string) {
   const index = notRepliedRequests.value.indexOf(requestId)
   if (index !== -1) {
@@ -127,7 +127,7 @@ function failTask() {
 function connect() {
   stompClient.connect(
       {},
-      frame => {
+      () => {
         stompClient.subscribe(`/topic/games/${gameId.value}/events/player-joined`, msg => {
           const event = JSON.parse(msg.body)
           if (playerId === event.playerId) {
@@ -172,12 +172,6 @@ function connect() {
         console.error(error);
       }
   );
-}
-
-function disconnect() {
-  if (stompClient) {
-    stompClient.disconnect();
-  }
 }
 
 </script>
