@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc && vite build --mode=production --base=/wanna-bet/",
+    "build": "vue-tsc && vite build --mode=production --base=/wanna-bet-fe/",
     "preview": "vite preview"
   },
   "dependencies": {
