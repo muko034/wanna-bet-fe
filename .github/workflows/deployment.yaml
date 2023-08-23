@@ -42,6 +42,8 @@ jobs:
           cache: 'npm'
       - name: Install dependencies
         run: npm install
+      - name: Install TypeScript
+        run: npm install typescript@latest -g
       - name: Compile TypeScript
         run: vue-tsc
       - name: Build
