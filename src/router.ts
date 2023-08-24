@@ -14,6 +14,7 @@ export type AppRouteNames =
   | 'admin'
   | 'play'
   | 'login'
+  | 'notFound'
 
 export const routes: RouteRecordRaw[] = [
   {
@@ -41,6 +42,11 @@ export const routes: RouteRecordRaw[] = [
     path: '/login',
     component: () => Login,
     beforeEnter: () => !isAuthorized(),
+  },
+  {
+    name: 'notFound',
+    path: '/404',
+    component: NotFound,
   },
   {
     path: "/:catchAll(.*)",

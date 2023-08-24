@@ -40,4 +40,9 @@ export interface Task {
     content: string
 }
 
+export interface Bet {
+    amount: number,
+    result?: string
+}
+
 export default GameService;
