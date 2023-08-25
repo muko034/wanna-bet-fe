@@ -25,11 +25,11 @@ const allNavLinks = computed<NavLink[]>(() => [
     title: 'Dołącz',
     display: 'all',
   },
-  {
-    name: 'login',
-    title: 'Sign in',
-    display: 'anonym',
-  },
+  // {
+  //   name: 'login',
+  //   title: 'Sign in',
+  //   display: 'anonym',
+  // },
   {
     name: 'admin',
     title: 'Admin',
@@ -44,16 +44,16 @@ const navLinks = computed(() => allNavLinks.value.filter(
 </script>
 
 <template>
-  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm mb-3">
     <div class="container-fluid">
       <AppLink
           class="navbar-brand"
           name="home"
       >
-        Home
+        Założysz się?
       </AppLink>
 
-      <ul class="nav navbar-nav pull-xs-right">
+      <ul class="navbar-nav ml-auto">
         <li
             v-for="link in navLinks"
             :key="link.name"

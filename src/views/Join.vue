@@ -1,9 +1,39 @@
 <script setup lang="ts">
+import GameService, {GameBasicInfo} from "../services/game.ts";
+import {ref} from "vue";
+import TimeAgo from 'javascript-time-ago'
+import pl from 'javascript-time-ago/locale/pl'
+import AppLink from "../components/AppLink.vue";
+
+const games = ref<GameBasicInfo[]>([])
+GameService.getGames().then(res => {
+  games.value = res as GameBasicInfo[]
+})
+
+TimeAgo.addDefaultLocale(pl)
+
+const timeAgo = new TimeAgo('pl-PL')
+
+function formatTime(date: string) {
+  return timeAgo.format(Date.parse(date))
+}
 
 </script>
 
 <template>
-  <h1>Join</h1>
+  <ul class="list-group">
+    <li
+        v-for="game in games"
+        class="list-group-item">
+      <AppLink
+          class="nav-link"
+          active-class="active"
+          name="play"
+          :params="{gameId: game.id}">
+        <strong>{{game.id}}</strong> {{formatTime(game.createdAt)}}
+      </AppLink>
+    </li>
+  </ul>
 </template>
 
 <style scoped>

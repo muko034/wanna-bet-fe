@@ -12,6 +12,17 @@ const GameService = {
         return data
     },
 
+    async getGames() {
+        const {data} = await axios.get<GameBasicInfo[]>(`${CONFIG.API_URL}/games`)
+        return data
+    },
+
+}
+
+export interface GameBasicInfo {
+    id: string,
+    status: string,
+    createdAt: string
 }
 
 export interface Game {

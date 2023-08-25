@@ -11,7 +11,6 @@ async function createGame() {
 
 <template>
   <div class="container mt-5">
-    <h1>Home</h1>
     <button @click="createGame" type="submit" class="btn btn-primary">Nowa gra</button>
   </div>
 </template>
