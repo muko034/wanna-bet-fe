@@ -259,66 +259,71 @@ onMounted(async () => {
   <div class="container">
     <div class="row">
       <div class="col-md-8 mb-3">
-        <div class="card" style="min-height: 20rem;">
-          <div v-if="state === 'ENTERED'" id="join">
-            <div class="mb-3">
-              <label for="playerNameInput" class="form-label">Imię</label>
-              <input v-model="playerName" type="text" class="form-control" id="playerNameInput"
-                     placeholder="Wprowadź twoje imię">
+        <div class="card text-center" style="min-height: 20rem;">
+          <div class="card-header">
+            <h2>{{ gameId }}</h2>
+          </div>
+          <div class="card-body">
+            <div v-if="state === 'ENTERED'" id="join">
+              <div class="mb-3">
+                <label for="playerNameInput" class="form-label">Imię</label>
+                <input v-model="playerName" type="text" class="form-control" id="playerNameInput"
+                       placeholder="Wprowadź twoje imię">
+              </div>
+              <button @click="joinGame" type="submit" class="btn btn-primary">Dołącz</button>
             </div>
-            <button @click="joinGame" type="submit" class="btn btn-primary">Dołącz</button>
-          </div>
-          <div v-else-if="state === 'JOINED'">
-            <button :disabled="game.players.length < 2" @click="startGame" type="submit" class="btn btn-primary">Start
-            </button>
-          </div>
-          <div v-else-if="state === 'BETTING'">
-            <div class="card">
-              <div class="card-header">Zadanie {{ task.type == 'PHYSICAL' ? 'ZRĘCZNOŚCIOWE' : 'UMYSŁOWE' }}</div>
-              <div class="card-body">
-                <p v-if="!currentPlayer.isActive || task.type == 'PHYSICAL'" class="card-text">{{ task.content }}</p>
+            <div v-else-if="state === 'JOINED'">
+              <button :disabled="game.players.length < 2" @click="startGame" type="submit" class="btn btn-primary">Start
+              </button>
+            </div>
+            <div v-else-if="state === 'BETTING'">
+              <div class="card">
+                <div class="card-header">Zadanie {{ task.type == 'PHYSICAL' ? 'ZRĘCZNOŚCIOWE' : 'UMYSŁOWE' }}</div>
+                <div class="card-body">
+                  <p v-if="!currentPlayer.isActive || task.type == 'PHYSICAL'" class="card-text">{{ task.content }}</p>
+                </div>
+              </div>
+              <div v-if="!currentPlayer.isActive">
+                <label for="amountInput" class="form-label">Ile obstawiasz? {{ bet.amount }}</label>
+                <input v-model="bet.amount" type="range" class="form-range" id="amountInput" min="1"
+                       :max="Math.floor(currentPlayer.points / 2)">
+                <div class="form-check form-check-inline">
+                  <input v-model="bet.result" value="YES" class="form-check-input" type="radio" name="inlineRadioOptions"
+                         id="yesBetOption">
+                  <label class="form-check-label" for="yesBetOption">Tak</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input v-model="bet.result" value="NO" class="form-check-input" type="radio" name="inlineRadioOptions"
+                         id="noBetOption">
+                  <label class="form-check-label" for="noBetOption">Nie</label>
+                </div>
+                <button :disabled="!bet.result" @click="betTask" type="submit" class="btn btn-primary">Obstaw</button>
+              </div>
+              <div v-if="currentPlayer.isActive">
+                <p>Poczekaj aż inni gracze skończą obstawiać</p>
               </div>
             </div>
-            <div v-if="!currentPlayer.isActive">
-              <label for="amountInput" class="form-label">Ile obstawiasz? {{ bet.amount }}</label>
-              <input v-model="bet.amount" type="range" class="form-range" id="amountInput" min="1"
-                     :max="Math.floor(currentPlayer.points / 2)">
-              <div class="form-check form-check-inline">
-                <input v-model="bet.result" value="YES" class="form-check-input" type="radio" name="inlineRadioOptions"
-                       id="yesBetOption">
-                <label class="form-check-label" for="yesBetOption">Tak</label>
-              </div>
-              <div class="form-check form-check-inline">
-                <input v-model="bet.result" value="NO" class="form-check-input" type="radio" name="inlineRadioOptions"
-                       id="noBetOption">
-                <label class="form-check-label" for="noBetOption">Nie</label>
-              </div>
-              <button :disabled="!bet.result" @click="betTask" type="submit" class="btn btn-primary">Obstaw</button>
+            <div v-else-if="state === 'TASK_EXECUTING'">
+              <p>Czy gracz wykonał zadanie?</p>
+              <button @click="successTask" type="submit" class="btn btn-success">Tak</button>
+              <button @click="failTask" type="submit" class="btn btn-danger">Nie</button>
             </div>
-            <div v-if="currentPlayer.isActive">
-              <p>Poczekaj aż inni gracze skończą obstawiać</p>
-            </div>
-          </div>
-          <div v-else-if="state === 'TASK_EXECUTING'">
-            <p>Czy gracz wykonał zadanie?</p>
-            <button @click="successTask" type="submit" class="btn btn-success">Tak</button>
-            <button @click="failTask" type="submit" class="btn btn-danger">Nie</button>
-          </div>
-          <div v-else-if="state === 'LOADING'">
-            <div class="spinner-border" role="status">
-              <span class="sr-only"></span>
+            <div v-else-if="state === 'LOADING'">
+              <div class="spinner-border" role="status">
+                <span class="sr-only"></span>
+              </div>
             </div>
           </div>
         </div>
       </div>
       <aside class="col-md-4 mb-3">
-        <div class="card">
+        <div class="card text-center">
           <div class="card-header">Ty</div>
           <div class="card-body">
             <h2>{{ currentPlayer.name }} {{ currentPlayer.points }}</h2>
           </div>
         </div>
-        <div class="card">
+        <div class="card text-center">
           <div class="card-header">Gracze</div>
           <div class="card-body">
             <ul class="list-group list-group-flush">
