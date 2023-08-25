@@ -3,14 +3,12 @@ import {CONFIG} from "../config.ts";
 
 const GameService = {
     async createGame() {
-        // @ts-ignore
-        const {data, _status} = await axios.post<Game>(`${CONFIG.API_URL}/games`)
+        const {data} = await axios.post<Game>(`${CONFIG.API_URL}/games`)
         return data
     },
 
     async getGame(gameId: string) {
-        // @ts-ignore
-        const {data, status} = await axios.get<Game>(`${CONFIG.API_URL}/games/${gameId}`)
+        const {data} = await axios.get<Game>(`${CONFIG.API_URL}/games/${gameId}`)
         return data
     },
 
