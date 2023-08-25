@@ -25,8 +25,17 @@ const state = computed<string>(() => {
   return game.value.status
 })
 const playerName = ref('')
-const task = ref<Task>(newTask())
-const playerId = ref<string>('')
+const task = computed<Task>(() => game.value.task ?? newTask())
+const playerId = computed<string>(() => {
+  const playerId: string | null = localStorage.getItem(`playerId-${gameId.value}`)
+  if (playerId) {
+    return playerId
+  } else {
+    const newId = uuidv4()
+    localStorage.setItem(`playerId-${gameId.value}`, newId)
+    return newId
+  }
+})
 const currentPlayer = computed<Player>(() => game.value.players.find((it) => it.id === playerId.value) ?? {
   id: playerId.value,
   name: playerName.value,
@@ -35,16 +44,14 @@ const currentPlayer = computed<Player>(() => game.value.players.find((it) => it.
   isActive: false
 })
 const bet = ref<Bet>(newBet())
-const didCurrentPlayerJoined = ref(false)
+const didCurrentPlayerJoined = computed<boolean>(() => game.value.players.findIndex((it) => it.id === playerId.value) >= 0)
 const requestsWithoutReply = ref<string[]>([])
+let lastEventTimestamp: number = Date.now()
 
 async function init() {
   await fetchGame(gameId.value)
-  task.value = newTask()
   bet.value = newBet()
   playerName.value = ''
-  playerId.value = uuidv4()
-  didCurrentPlayerJoined.value = false
   requestsWithoutReply.value = []
 
   if (!stompClient.connected) {
@@ -175,9 +182,7 @@ function subscribe() {
   return [
     stompClient.subscribe(`/topic/games/${gameId.value}/events/player-joined`, msg => {
       const event = JSON.parse(msg.body)
-      if (playerId.value === event.playerId) {
-        didCurrentPlayerJoined.value = true
-      }
+      console.log(event)
       game.value = event.game
       deleteFromNotRepliedRequests(event.correlationId)
     }),
@@ -189,18 +194,25 @@ function subscribe() {
     stompClient.subscribe(`/topic/games/${gameId.value}/events/task-drawn`, msg => {
       const event = JSON.parse(msg.body)
       game.value = event.game
-      task.value = event.task
       bet.value = newBet()
       deleteFromNotRepliedRequests(event.correlationId)
     }),
     stompClient.subscribe(`/topic/games/${gameId.value}/events/player-bet`, msg => {
       const event = JSON.parse(msg.body)
-      game.value = event.game
+      const eventTimestamp = Date.parse(event.createdAt)
+      if (eventTimestamp > lastEventTimestamp) {
+        lastEventTimestamp = eventTimestamp
+        game.value = event.game
+      }
       deleteFromNotRepliedRequests(event.correlationId)
     }),
     stompClient.subscribe(`/topic/games/${gameId.value}/events/all-player-bet`, msg => {
       const event = JSON.parse(msg.body)
-      game.value = event.game
+      const eventTimestamp = Date.parse(event.createdAt)
+      if (eventTimestamp > lastEventTimestamp) {
+        lastEventTimestamp = eventTimestamp
+        game.value = event.game
+      }
       deleteFromNotRepliedRequests(event.correlationId)
     }),
     stompClient.subscribe(`/topic/games/${gameId.value}/events/task-completed`, msg => {

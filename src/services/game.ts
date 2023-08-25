@@ -18,6 +18,7 @@ export interface Game {
     id: string,
     status: string,
     players: Array<Player>,
+    task?: Task
 }
 
 export interface Player {
