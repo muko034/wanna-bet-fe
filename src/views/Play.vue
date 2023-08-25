@@ -318,19 +318,13 @@ onMounted(async () => {
       </div>
       <aside class="col-md-4 mb-3">
         <div class="card text-center">
-          <div class="card-header">Ty</div>
-          <div class="card-body">
-            <h2>{{ currentPlayer.name }} {{ currentPlayer.points }}</h2>
-          </div>
-        </div>
-        <div class="card text-center">
           <div class="card-header">Gracze</div>
           <div class="card-body">
             <ul class="list-group list-group-flush">
               <li v-for="player in game.players" class="list-group-item">
                 <i v-if="player.isActive" class="bi bi-star-fill"></i>
                 <i v-if="player.didBet" class="bi bi-coin"></i>
-                {{ player.name }} {{ player.points }}
+                {{ player.name }}<span v-if="player.id === currentPlayer.id" style="color: #0a53be"> (ty)</span> {{ player.points }}
               </li>
             </ul>
           </div>
