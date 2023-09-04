@@ -47,7 +47,8 @@ export interface JoinGameResponse {
 export interface Task {
     id: number,
     type: string,
-    content: string
+    content: string,
+    timeLimit?: string,
 }
 
 export interface Bet {

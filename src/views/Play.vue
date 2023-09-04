@@ -73,7 +73,8 @@ function newTask(): Task {
   return {
     id: 0,
     type: '',
-    content: ''
+    content: '',
+    timeLimit: 'NONE'
   }
 }
 
@@ -261,26 +262,49 @@ onMounted(async () => {
       <div class="col-md-8 mb-3">
         <div class="card text-center" style="min-height: 20rem;">
           <div class="card-header">
-            <h2>{{ gameId }}</h2>
+            <h2 v-if="state === 'ENTERED'">Dołącz do gry [{{gameId}}]</h2>
+            <h2 v-else-if="state === 'BETTING'">Obstawianie [{{gameId}}]</h2>
+            <h2 v-else-if="state === 'JOINED'">Wszyscy gotowi? [{{gameId}}]</h2>
+            <h2 v-else-if="state === 'TASK_EXECUTING'">Czas próby [{{gameId}}]</h2>
+            <h2 v-else>[{{gameId}}]</h2>
           </div>
           <div class="card-body">
             <div v-if="state === 'ENTERED'" id="join">
               <div class="mb-3">
-                <label for="playerNameInput" class="form-label">Imię</label>
+                <label for="playerNameInput" class="form-label text-left">Imię</label>
                 <input v-model="playerName" type="text" class="form-control" id="playerNameInput"
                        placeholder="Wprowadź twoje imię">
               </div>
               <button @click="joinGame" type="submit" class="btn btn-primary">Dołącz</button>
             </div>
             <div v-else-if="state === 'JOINED'">
-              <button :disabled="game.players.length < 2" @click="startGame" type="submit" class="btn btn-primary">Start
+              <button
+                  :disabled="game.players.length < 2"
+                  @click="startGame"
+                  type="submit"
+                  class="btn btn-primary">
+                Rozpocznij grę
               </button>
             </div>
-            <div v-else-if="state === 'BETTING'">
-              <div class="card">
-                <div class="card-header">Zadanie {{ task.type == 'PHYSICAL' ? 'ZRĘCZNOŚCIOWE' : 'UMYSŁOWE' }}</div>
+            <div v-else-if="state === 'BETTING'" class="row d-flex justify-content-center">
+              <div class="card col text-center" style="max-width: 20rem; min-height: 20rem; margin-bottom: 20px">
+                <div v-if="task.type == 'PHYSICAL'" class="card-header">
+                  Zadanie zręcznościowe <i
+                    v-if="task.timeLimit !== 'NONE'"
+                    :class="task.timeLimit === 'QUARTER_MINUTE'
+                    ? 'bi bi-hourglass-split icon-yellow'
+                    : (task.timeLimit === 'HALF_MINUTE' ? 'bi bi-hourglass-split icon-red': 'bi bi-hourglass-split')"></i>
+                </div>
+                <div v-else class="card-header">
+                  Zadanie umysłowe <i
+                    v-if="task.timeLimit !== 'NONE'"
+                    :class="task.timeLimit === 'QUARTER_MINUTE'
+                    ? 'bi bi-hourglass-split icon-yellow'
+                    : (task.timeLimit === 'HALF_MINUTE' ? 'bi bi-hourglass-split icon-red': 'bi bi-hourglass-split')"></i>
+                </div>
                 <div class="card-body">
                   <p v-if="!currentPlayer.isActive || task.type == 'PHYSICAL'" class="card-text">{{ task.content }}</p>
+                  <p v-else class="card-text">Poczekaj aż inni gracze skończą obstawiać</p>
                 </div>
               </div>
               <div v-if="!currentPlayer.isActive">
@@ -303,10 +327,17 @@ onMounted(async () => {
                 <p>Poczekaj aż inni gracze skończą obstawiać</p>
               </div>
             </div>
-            <div v-else-if="state === 'TASK_EXECUTING'">
+            <div v-else-if="state === 'TASK_EXECUTING'" class="row d-flex justify-content-center">
+              <div class="card col text-center" style="max-width: 20rem; min-height: 20rem; margin-bottom: 20px">
+                <div class="card-header">Zadanie {{ task.type == 'PHYSICAL' ? 'ZRĘCZNOŚCIOWE' : 'UMYSŁOWE' }}</div>
+                <div class="card-body">
+                  <p v-if="!currentPlayer.isActive || task.type == 'PHYSICAL'" class="card-text">{{ task.content }}</p>
+                  <p v-else class="card-text">Poczekaj aż inni gracze skończą obstawiać</p>
+                </div>
+              </div>
               <p>Czy gracz wykonał zadanie?</p>
-              <button @click="successTask" type="submit" class="btn btn-success">Tak</button>
-              <button @click="failTask" type="submit" class="btn btn-danger">Nie</button>
+              <button @click="successTask" type="submit" class="btn btn-success col">Tak</button>
+              <button @click="failTask" type="submit" class="btn btn-danger col">Nie</button>
             </div>
             <div v-else-if="state === 'LOADING'">
               <div class="spinner-border" role="status">
@@ -318,13 +349,15 @@ onMounted(async () => {
       </div>
       <aside class="col-md-4 mb-3">
         <div class="card text-center">
-          <div class="card-header">Gracze</div>
+          <div class="card-header">Punktacja</div>
           <div class="card-body">
             <ul class="list-group list-group-flush">
               <li v-for="player in game.players" class="list-group-item">
                 <i v-if="player.isActive" class="bi bi-star-fill"></i>
                 <i v-if="player.didBet" class="bi bi-coin"></i>
-                {{ player.name }}<span v-if="player.id === currentPlayer.id" style="color: #0a53be"> (ty)</span> {{ player.points }}
+                <span :class="player.id === currentPlayer.id ? 'fw-bold' : 'fw-normal'">
+                  &nbsp;{{ player.name }} {{ player.points }}
+                </span>
               </li>
             </ul>
           </div>
@@ -335,5 +368,10 @@ onMounted(async () => {
 </template>
 
 <style scoped>
-
+  .icon-red {
+    color: red;
+  }
+  .icon-yellow {
+    color: yellow;
+  }
 </style>

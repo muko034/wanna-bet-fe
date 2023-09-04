@@ -21,19 +21,21 @@ function formatTime(date: string) {
 </script>
 
 <template>
-  <ul class="list-group">
-    <li
-        v-for="game in games"
-        class="list-group-item">
-      <AppLink
-          class="nav-link"
-          active-class="active"
-          name="play"
-          :params="{gameId: game.id}">
-        <strong>{{game.id}}</strong> {{formatTime(game.createdAt)}}
-      </AppLink>
-    </li>
-  </ul>
+  <div class="container">
+    <ul class="list-group">
+      <li
+          v-for="game in games"
+          class="list-group-item">
+        <AppLink
+            class="nav-link"
+            active-class="active"
+            name="play"
+            :params="{gameId: game.id}">
+          <strong>{{ game.id }}</strong> {{ formatTime(game.createdAt) }}
+        </AppLink>
+      </li>
+    </ul>
+  </div>
 </template>
 
 <style scoped>

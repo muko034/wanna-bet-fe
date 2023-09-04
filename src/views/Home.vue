@@ -4,14 +4,18 @@ import {routerPush} from "../router.ts";
 
 async function createGame() {
   const game = await GameService.createGame()
-  await routerPush('play', { gameId: game.id })
+  await routerPush('play', {gameId: game.id})
 }
 
 </script>
 
 <template>
   <div class="container mt-5">
-    <button @click="createGame" type="submit" class="btn btn-primary">Nowa gra</button>
+    <div class="row d-flex justify-content-center">
+      <div class="col text-center">
+        <button @click="createGame" type="submit" class="btn btn-primary">Nowa gra</button>
+      </div>
+    </div>
   </div>
 </template>
 
