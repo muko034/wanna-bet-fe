@@ -315,7 +315,7 @@ onMounted(async () => {
                     : (task.timeLimit === 'HALF_MINUTE' ? 'bi bi-hourglass-split icon-red': 'bi bi-hourglass-split')"></i>
                 </div>
                 <div class="card-body">
-                  <p v-if="!currentPlayer.isActive || task.type == 'PHYSICAL'" class="card-text">{{ task.content }}</p>
+                  <p v-if="!currentPlayer.isActive" class="card-text">{{ task.content }}</p>
                   <p v-else class="card-text">Poczekaj aż inni gracze skończą obstawiać</p>
                 </div>
                 <div>
