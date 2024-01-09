@@ -17,6 +17,11 @@ const GameService = {
         return data
     },
 
+    async kickPlayerOut(gameId: string, playerId: string) {
+        const {data} = await axios.post<{}>(`${CONFIG.API_URL}/games/${gameId}/actions/kick-out/players/${playerId}`)
+        return data
+    },
+
 }
 
 export interface GameBasicInfo {

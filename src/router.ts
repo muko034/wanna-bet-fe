@@ -7,6 +7,7 @@ import NotFound from "./views/NotFound.vue";
 import {isAuthorized} from "./store/user.ts";
 import Login from "./views/SignIn.vue";
 import Play from "./views/Play.vue";
+import GameAdmin from "./views/GameAdmin.vue";
 
 export type AppRouteNames =
   | 'home'
@@ -15,6 +16,7 @@ export type AppRouteNames =
   | 'play'
   | 'login'
   | 'notFound'
+  | 'gameAdmin'
 
 export const routes: RouteRecordRaw[] = [
   {
@@ -36,6 +38,11 @@ export const routes: RouteRecordRaw[] = [
     name: 'play',
     path: '/play/:gameId',
     component: Play,
+  },
+  {
+    name: 'gameAdmin',
+    path: '/play/:gameId/admin',
+    component: GameAdmin,
   },
   {
     name: 'login',
