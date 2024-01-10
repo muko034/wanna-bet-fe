@@ -52,7 +52,7 @@ async function kickPlayerOut(playerId: string) {
                 <span class="fw-normal col">
                   &nbsp;{{ player.name }} {{ player.points }}
                 </span>
-                <i @click="kickPlayerOut(player.id)" class="bi-btn bi bi-trash3-fill col"></i>
+                <i @click="kickPlayerOut(player.id)" class="bi bi-trash3-fill bi-btn"></i>
               </li>
             </ul>
           </div>
@@ -65,6 +65,5 @@ async function kickPlayerOut(playerId: string) {
 <style scoped>
 .bi-btn:hover {
   cursor: pointer;
-  background-color: #e5c7ca;
 }
 </style>

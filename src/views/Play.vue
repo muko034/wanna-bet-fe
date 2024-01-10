@@ -266,6 +266,10 @@ onMounted(async () => {
   // connect()
   // refreshGame()
 })
+
+function goToAdmin() {
+  routerPush('gameAdmin', {gameId: gameId.value})
+}
 </script>
 
 <template>
@@ -274,10 +278,10 @@ onMounted(async () => {
       <div class="col-md-8 mb-3">
         <div class="card text-center" style="min-height: 20rem;">
           <div class="card-header">
-            <h2 v-if="state === 'ENTERED'">Dołącz do gry [{{ gameId }}]</h2>
-            <h2 v-else-if="state === 'BETTING'">Obstawianie [{{ gameId }}]</h2>
-            <h2 v-else-if="state === 'JOINED'">Wszyscy gotowi? [{{ gameId }}]</h2>
-            <h2 v-else-if="state === 'TASK_EXECUTING'">Czas próby [{{ gameId }}]</h2>
+            <h2 v-if="state === 'ENTERED'">Dołącz do gry</h2>
+            <h2 v-else-if="state === 'BETTING'">Obstawianie</h2>
+            <h2 v-else-if="state === 'JOINED'">Wszyscy gotowi?</h2>
+            <h2 v-else-if="state === 'TASK_EXECUTING'">Czas próby</h2>
             <h2 v-else>[{{ gameId }}]</h2>
           </div>
           <div class="card-body">
@@ -372,16 +376,32 @@ onMounted(async () => {
         </div>
       </div>
       <aside class="col-md-4 mb-3">
-        <div class="card text-center">
-          <div class="card-header">Punktacja</div>
+        <div class="card text-center" style="margin-bottom: 1rem">
+          <div class="card-header">Punktacja<div class="scores-gear"><i @click="goToAdmin" class="bi bi-gear btn btn-light btn-xs icn-light-gray"></i></div></div>
           <div class="card-body">
             <ul class="list-group list-group-flush">
               <li v-for="player in game.players" class="list-group-item">
                 <i v-if="player.isActive" class="bi bi-star-fill"></i>
                 <i v-if="player.didBet" class="bi bi-coin"></i>
                 <span :class="player.id === currentPlayer.id ? 'fw-bold' : 'fw-normal'">
-                  &nbsp;{{ player.name }} {{ player.points }}
+                  &nbsp;{{ player.name }} | {{ player.points }}
                 </span>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="card text-center">
+          <div class="card-header">Legenda</div>
+          <div class="card-body">
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item">
+                <i class="bi bi-star-fill"></i><span> - Gracz wykonujący zadanie</span>
+              </li>
+              <li class="list-group-item">
+                <i class="bi bi-coin"></i><span> - Gracz obstawił już wynik</span>
+              </li>
+              <li class="list-group-item">
+                <span class="fw-bold">Obecny gracz (ty)</span>
               </li>
             </ul>
           </div>
@@ -398,5 +418,19 @@ onMounted(async () => {
 
 .icon-yellow {
   color: #ffba19;
+}
+
+.scores-gear {
+  position: relative;
+  float: right;
+}
+
+.btn-xs {
+  --bs-btn-padding-x: 0rem;
+  --bs-btn-padding-y: 0rem;
+}
+
+.icn-light-gray{
+  color: #cccccc;
 }
 </style>
