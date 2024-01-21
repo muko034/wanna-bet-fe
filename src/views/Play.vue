@@ -153,6 +153,7 @@ function successTask() {
   stompClient.send("/app/complete-task", JSON.stringify({
     requestId: requestId,
     gameId: gameId.value,
+    playerId: playerId.value,
     taskResult: 'YES',
   }))
   requestsWithoutReply.value.push(requestId)
@@ -163,6 +164,7 @@ function failTask() {
   stompClient.send("/app/complete-task", JSON.stringify({
     requestId: requestId,
     gameId: gameId.value,
+    playerId: playerId.value,
     taskResult: 'NO',
   }))
   requestsWithoutReply.value.push(requestId)
@@ -207,7 +209,7 @@ function subscribe() {
       game.value = event.game
       bet.value = newBet()
       if (deleteFromNotRepliedRequests(event.correlationId)) {
-        $toast.info("Zadanie zostało zminione!", toastProps)
+        $toast.info("Zadanie zostało zmienione!", toastProps)
       }
     }),
     stompClient.subscribe(`/topic/games/${gameId.value}/events/player-bet`, msg => {
