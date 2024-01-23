@@ -48,7 +48,7 @@ const didCurrentPlayerJoined = computed<boolean>(() => game.value.players.findIn
 const requestsWithoutReply = ref<string[]>([])
 let lastEventTimestamp: number = Date.now()
 const taskCompletion = ref<TaskResult>(TaskResult.UNDEFINED)
-watch(state, async (newValue, oldValue) => {
+watch(state, async (newValue, _) => {
   if (newValue !== 'TASK_EXECUTING' && newValue !== 'LOADING') {
     taskCompletion.value = TaskResult.UNDEFINED
   }
