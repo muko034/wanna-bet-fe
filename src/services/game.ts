@@ -56,6 +56,12 @@ export interface Task {
     timeLimit?: string,
 }
 
+export enum TaskResult {
+    UNDEFINED,
+    YES,
+    NO
+}
+
 export interface Bet {
     amount: number,
     result?: string

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {onBeforeRouteUpdate, useRoute} from "vue-router";
 import {computed, onMounted, ref, watch} from "vue";
-import GameService, {Bet, Game, Player, Task} from "../services/game.ts";
+import GameService, {Bet, Game, Player, Task, TaskResult} from "../services/game.ts";
 import Stomp, {Subscription} from "webstomp-client"
 import {CONFIG} from "../config.ts";
 import {v4 as uuidv4} from 'uuid';
@@ -47,6 +47,12 @@ const bet = ref<Bet>(newBet())
 const didCurrentPlayerJoined = computed<boolean>(() => game.value.players.findIndex((it) => it.id === playerId.value) >= 0)
 const requestsWithoutReply = ref<string[]>([])
 let lastEventTimestamp: number = Date.now()
+const taskCompletion = ref<TaskResult>(TaskResult.UNDEFINED)
+watch(state, async (newValue, oldValue) => {
+  if (newValue !== 'TASK_EXECUTING' && newValue !== 'LOADING') {
+    taskCompletion.value = TaskResult.UNDEFINED
+  }
+})
 
 async function init() {
   await fetchGame(gameId.value)
@@ -156,6 +162,7 @@ function successTask() {
     playerId: playerId.value,
     taskResult: 'YES',
   }))
+  taskCompletion.value = TaskResult.YES
   requestsWithoutReply.value.push(requestId)
 }
 
@@ -167,6 +174,7 @@ function failTask() {
     playerId: playerId.value,
     taskResult: 'NO',
   }))
+  taskCompletion.value = TaskResult.NO
   requestsWithoutReply.value.push(requestId)
 }
 
@@ -326,7 +334,7 @@ function goToAdmin() {
                 </div>
                 <div>
                   <button @click="redrawTask" type="button" class="btn btn-light btn-sm">
-                    <span class="bi bi-shuffle" style="color: gray"></span>
+                    <span class="bi bi-shuffle" style="color: rgb(128,128,128)"></span>
                   </button>
                 </div>
               </div>
@@ -365,8 +373,10 @@ function goToAdmin() {
               </div>
               <p>Czy gracz wykonał zadanie?</p>
               <div class="row">
-                <button @click="successTask" type="submit" class="btn btn-success col">Tak</button>
-                <button @click="failTask" type="submit" class="btn btn-danger col">Nie</button>
+                <div class="btn-group" role="group" aria-label="Basic example">
+                  <button @click="successTask" type="submit" class="btn btn-success" :disabled="taskCompletion == TaskResult.YES">Tak</button>
+                  <button @click="failTask" type="submit" class="btn btn-danger" :disabled="taskCompletion == TaskResult.NO">Nie</button>
+                </div>
               </div>
             </div>
             <div v-else-if="state === 'LOADING'">
