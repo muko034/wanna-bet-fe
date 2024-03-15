@@ -5,6 +5,7 @@ import GameService, {Bet, Game, Player, Task, TaskResult} from "../services/game
 import {v4 as uuidv4} from 'uuid';
 import {ToastProps, useToast} from "vue-toast-notification";
 import {routerPush} from "../router.ts";
+import axios from "axios";
 
 
 const route = useRoute()
@@ -104,18 +105,26 @@ async function joinGame() {
   try {
     game.value = await GameService.joinGame(gameId.value, playerName.value, playerId.value) as Game
   } catch (error) {
-    // TODO: error handling
-    toastError(error)
+    if (axios.isAxiosError(error)) {
+      console.error(error.response);
+      toastError("?????")
+      // TODO: better error handling. use toastError
+    } else {
+      console.error(error);
+    }
   }
-
 }
 
 async function startGame() {
   try {
     game.value = await GameService.startGame(gameId.value) as Game
   } catch (error) {
-    // TODO: error handling
-    toastError(error)
+    if (axios.isAxiosError(error)) {
+      console.error(error.response);
+      // TODO: better error handling. use toastError
+    } else {
+      console.error(error);
+    }
   }
 }
 
@@ -126,13 +135,26 @@ async function betTask() {
   try {
     game.value = await GameService.betTask(gameId.value, playerId.value, bet.value.amount, bet.value.result!) as Game
   } catch (error) {
-    // TODO: error handling
-    toastError(error)
+    if (axios.isAxiosError(error)) {
+      console.error(error.response);
+      // TODO: better error handling. use toastError
+    } else {
+      console.error(error);
+    }
   }
 }
 
 async function successTask() {
-  game.value = await GameService.completeTask(gameId.value, playerId.value, 'YES') as Game
+  try {
+    game.value = await GameService.completeTask(gameId.value, playerId.value, 'YES') as Game
+  } catch (error){
+    if (axios.isAxiosError(error)) {
+      console.error(error.response);
+      // TODO: better error handling. use toastError
+    } else {
+      console.error(error);
+    }
+  }
   // FIXME async
   taskCompletion.value = TaskResult.YES
 }
@@ -141,8 +163,12 @@ async function failTask() {
   try {
     game.value = await GameService.completeTask(gameId.value, playerId.value, 'NO') as Game
   } catch (error) {
-    // TODO: error handling
-    toastError(error)
+    if (axios.isAxiosError(error)) {
+      console.error(error.response);
+      // TODO: better error handling. use toastError
+    } else {
+      console.error(error);
+    }
   }
   // FIXME async
   taskCompletion.value = TaskResult.NO
@@ -152,8 +178,12 @@ async function redrawTask() {
   try {
     game.value = await GameService.drawTask(gameId.value) as Game
   } catch (error) {
-    // TODO: error handling
-    toastError(error)
+    if (axios.isAxiosError(error)) {
+      console.error(error.response);
+      // TODO: better error handling. use toastError
+    } else {
+      console.error(error);
+    }
   }
 }
 
@@ -244,7 +274,11 @@ function goToAdmin() {
                 <label for="amountInput" class="form-label">Ile obstawiasz? {{ bet.amount }}</label>
                 <input v-model="bet.amount" type="range" class="form-range" id="amountInput" min="1"
                        :max="Math.floor(currentPlayer.points / 2)"
-                       @input="event => bet.amount = parseInt(event.target.value)">
+                       @input="(event: Event) => {
+         const inputEvent = event as InputEvent; // Assuming it's an input event
+         const target = inputEvent.target as HTMLInputElement;
+         bet.amount = parseInt(target?.value);
+       }">
                 <p>Czy gracz wykona zadanie?</p>
                 <div class="form-check form-check-inline">
                   <input v-model="bet.result" value="YES" class="form-check-input" type="radio"
