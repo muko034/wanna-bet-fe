@@ -13,7 +13,7 @@ const GameService = {
     },
 
     async getGames() {
-        const {data} = await axios.get<GameBasicInfo[]>(`${CONFIG.API_URL}/games`)
+        const {data} = await axios.get<Games>(`${CONFIG.API_URL}/games`)
         return data
     },
 
@@ -82,9 +82,15 @@ const GameService = {
 
 }
 
+export interface Games {
+    content: Array<GameBasicInfo>,
+    hasMore: boolean
+}
+
 export interface GameBasicInfo {
     id: string,
     status: string,
+    round?: number
     createdAt: string
 }
 

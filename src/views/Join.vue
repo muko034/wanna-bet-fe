@@ -1,13 +1,16 @@
 <script setup lang="ts">
-import GameService, {GameBasicInfo} from "../services/game.ts";
+import GameService, {Games} from "../services/game.ts";
 import {ref} from "vue";
 import TimeAgo from 'javascript-time-ago'
 import pl from 'javascript-time-ago/locale/pl'
 import AppLink from "../components/AppLink.vue";
 
-const games = ref<GameBasicInfo[]>([])
+const games = ref<Games>({
+  content: [],
+  hasMore: false
+})
 GameService.getGames().then(res => {
-  games.value = res as GameBasicInfo[]
+  games.value = res as Games
 })
 
 TimeAgo.addDefaultLocale(pl)
@@ -24,7 +27,7 @@ function formatTime(date: string) {
   <div class="container">
     <ul class="list-group">
       <li
-          v-for="game in games"
+          v-for="game in games.content"
           class="list-group-item">
         <AppLink
             class="nav-link"
