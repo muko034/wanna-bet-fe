@@ -2,8 +2,6 @@
 import {onBeforeRouteUpdate, useRoute} from "vue-router";
 import {computed, onMounted, ref, watch} from "vue";
 import GameService, {Bet, Game, Player, Task, TaskResult} from "../services/game.ts";
-import Stomp, {Subscription} from "webstomp-client"
-import {CONFIG} from "../config.ts";
 import {v4 as uuidv4} from 'uuid';
 import {ToastProps, useToast} from "vue-toast-notification";
 import {routerPush} from "../router.ts";
@@ -18,9 +16,6 @@ const state = computed<string>(() => {
   }
   if (game.value.status === 'CREATED') {
     return 'JOINED'
-  }
-  if (requestsWithoutReply.value.length > 0) {
-    return 'LOADING'
   }
   return game.value.status
 })
@@ -45,9 +40,8 @@ const currentPlayer = computed<Player>(() => game.value.players.find((it) => it.
 })
 const bet = ref<Bet>(newBet())
 const didCurrentPlayerJoined = computed<boolean>(() => game.value.players.findIndex((it) => it.id === playerId.value) >= 0)
-const requestsWithoutReply = ref<string[]>([])
-let lastEventTimestamp: number = Date.now()
 const taskCompletion = ref<TaskResult>(TaskResult.UNDEFINED)
+
 watch(state, async (newValue, _) => {
   if (newValue !== 'TASK_EXECUTING' && newValue !== 'LOADING') {
     taskCompletion.value = TaskResult.UNDEFINED
@@ -58,13 +52,7 @@ async function init() {
   await fetchGame(gameId.value)
   bet.value = newBet()
   playerName.value = ''
-  requestsWithoutReply.value = []
-
-  if (!stompClient.connected) {
-    connect()
-  } else {
-    subscriptions = subscribe()
-  }
+  setInterval(() => fetchGame(gameId.value), 5000); // poll Game every 5 seconds
 }
 
 function newGame(): Game {
@@ -90,17 +78,6 @@ function newBet(): Bet {
   }
 }
 
-function deleteFromNotRepliedRequests(requestId: string): boolean {
-  const index = requestsWithoutReply.value.indexOf(requestId)
-  if (index !== -1) {
-    requestsWithoutReply.value.splice(index, 1)
-  }
-  return index !== -1
-}
-
-const stompClient = Stomp.client(CONFIG.WS_URL);
-let subscriptions: Array<Subscription> = []
-
 const $toast = useToast();
 const toastProps: ToastProps = {
   position: 'top-right',
@@ -123,142 +100,68 @@ async function fetchGame(id: string) {
   }
 }
 
-function joinGame() {
-  const requestId = uuidv4();
-  stompClient.send("/app/join-game", JSON.stringify({
-    requestId: requestId,
-    gameId: gameId.value,
-    playerName: playerName.value,
-    playerId: playerId.value
-  }))
-  requestsWithoutReply.value.push(requestId)
+async function joinGame() {
+  try {
+    game.value = await GameService.joinGame(gameId.value, playerName.value, playerId.value) as Game
+  } catch (error) {
+    // TODO: error handling
+    toastError(error)
+  }
+
 }
 
-function startGame() {
-  const requestId = uuidv4();
-  stompClient.send("/app/start-game", JSON.stringify({
-    requestId: requestId,
-    gameId: gameId.value
-  }))
-  requestsWithoutReply.value.push(requestId)
+async function startGame() {
+  try {
+    game.value = await GameService.startGame(gameId.value) as Game
+  } catch (error) {
+    // TODO: error handling
+    toastError(error)
+  }
 }
 
-function betTask() {
-  const requestId = uuidv4();
-  stompClient.send("/app/bet-task", JSON.stringify({
-    requestId: requestId,
-    playerId: playerId.value,
-    amount: bet.value.amount,
-    result: bet.value.result,
-  }))
-  requestsWithoutReply.value.push(requestId)
+async function betTask() {
+  if (!bet.value.result) {
+    // TODO Czy result może być nullem?
+  }
+  try {
+    game.value = await GameService.betTask(gameId.value, playerId.value, bet.value.amount, bet.value.result!) as Game
+  } catch (error) {
+    // TODO: error handling
+    toastError(error)
+  }
 }
 
-function successTask() {
-  const requestId = uuidv4();
-  stompClient.send("/app/complete-task", JSON.stringify({
-    requestId: requestId,
-    gameId: gameId.value,
-    playerId: playerId.value,
-    taskResult: 'YES',
-  }))
+async function successTask() {
+  game.value = await GameService.completeTask(gameId.value, playerId.value, 'YES') as Game
+  // FIXME async
   taskCompletion.value = TaskResult.YES
-  requestsWithoutReply.value.push(requestId)
 }
 
-function failTask() {
-  const requestId = uuidv4();
-  stompClient.send("/app/complete-task", JSON.stringify({
-    requestId: requestId,
-    gameId: gameId.value,
-    playerId: playerId.value,
-    taskResult: 'NO',
-  }))
+async function failTask() {
+  try {
+    game.value = await GameService.completeTask(gameId.value, playerId.value, 'NO') as Game
+  } catch (error) {
+    // TODO: error handling
+    toastError(error)
+  }
+  // FIXME async
   taskCompletion.value = TaskResult.NO
-  requestsWithoutReply.value.push(requestId)
 }
 
-function redrawTask() {
-  const requestId = uuidv4();
-  stompClient.send("/app/draw-task", JSON.stringify({
-    requestId: requestId,
-    gameId: gameId.value
-  }))
-  requestsWithoutReply.value.push(requestId)
-}
-
-function connect() {
-  stompClient.connect(
-      {},
-      () => {
-        subscriptions = subscribe()
-      },
-      error => {
-        console.error(error);
-      }
-  );
-}
-
-function subscribe() {
-  return [
-    stompClient.subscribe(`/topic/games/${gameId.value}/events/player-joined`, msg => {
-      const event = JSON.parse(msg.body)
-      console.log(event)
-      game.value = event.game
-      deleteFromNotRepliedRequests(event.correlationId)
-    }),
-    stompClient.subscribe(`/topic/games/${gameId.value}/events/game-started`, msg => {
-      const event = JSON.parse(msg.body)
-      game.value = event.game
-      deleteFromNotRepliedRequests(event.correlationId)
-    }),
-    stompClient.subscribe(`/topic/games/${gameId.value}/events/task-drawn`, msg => {
-      const event = JSON.parse(msg.body)
-      game.value = event.game
-      bet.value = newBet()
-      if (deleteFromNotRepliedRequests(event.correlationId)) {
-        $toast.info("Zadanie zostało zmienione!", toastProps)
-      }
-    }),
-    stompClient.subscribe(`/topic/games/${gameId.value}/events/player-bet`, msg => {
-      const event = JSON.parse(msg.body)
-      const eventTimestamp = Date.parse(event.createdAt)
-      if (eventTimestamp > lastEventTimestamp) {
-        lastEventTimestamp = eventTimestamp
-        game.value = event.game
-      }
-      deleteFromNotRepliedRequests(event.correlationId)
-    }),
-    stompClient.subscribe(`/topic/games/${gameId.value}/events/all-player-bet`, msg => {
-      const event = JSON.parse(msg.body)
-      const eventTimestamp = Date.parse(event.createdAt)
-      if (eventTimestamp > lastEventTimestamp) {
-        lastEventTimestamp = eventTimestamp
-        game.value = event.game
-      }
-      deleteFromNotRepliedRequests(event.correlationId)
-    }),
-    stompClient.subscribe(`/topic/games/${gameId.value}/events/task-completed`, msg => {
-      const event = JSON.parse(msg.body)
-      game.value = event.game
-      deleteFromNotRepliedRequests(event.correlationId)
-    }),
-    stompClient.subscribe(`/user/queue/errors`, msg => {
-      const error = JSON.parse(msg.body)
-      toastError(error.message)
-    })
-  ]
-}
-
-function unsubscribe() {
-  subscriptions.forEach(sub => stompClient.unsubscribe(sub.id))
+async function redrawTask() {
+  try {
+    game.value = await GameService.drawTask(gameId.value) as Game
+  } catch (error) {
+    // TODO: error handling
+    toastError(error)
+  }
 }
 
 watch(
     () => route.params.gameId,
     (newId, _) => {
       console.log(`From watch(): New gameId: ${newId}`)
-      unsubscribe()
+
       init()
     }
 )
@@ -273,8 +176,7 @@ onBeforeRouteUpdate(async (to, from) => {
 onMounted(async () => {
   console.log(`Mounted`)
   await init()
-  // connect()
-  // refreshGame()
+
 })
 
 function goToAdmin() {
@@ -341,7 +243,8 @@ function goToAdmin() {
               <div v-if="!currentPlayer.isActive">
                 <label for="amountInput" class="form-label">Ile obstawiasz? {{ bet.amount }}</label>
                 <input v-model="bet.amount" type="range" class="form-range" id="amountInput" min="1"
-                       :max="Math.floor(currentPlayer.points / 2)">
+                       :max="Math.floor(currentPlayer.points / 2)"
+                       @input="event => bet.amount = parseInt(event.target.value)">
                 <p>Czy gracz wykona zadanie?</p>
                 <div class="form-check form-check-inline">
                   <input v-model="bet.result" value="YES" class="form-check-input" type="radio"
@@ -374,8 +277,12 @@ function goToAdmin() {
               <p>Czy gracz wykonał zadanie?</p>
               <div class="row">
                 <div class="btn-group" role="group" aria-label="Basic example">
-                  <button @click="successTask" type="submit" class="btn btn-success" :disabled="taskCompletion == TaskResult.YES">Tak</button>
-                  <button @click="failTask" type="submit" class="btn btn-danger" :disabled="taskCompletion == TaskResult.NO">Nie</button>
+                  <button @click="successTask" type="submit" class="btn btn-success"
+                          :disabled="taskCompletion == TaskResult.YES">Tak
+                  </button>
+                  <button @click="failTask" type="submit" class="btn btn-danger"
+                          :disabled="taskCompletion == TaskResult.NO">Nie
+                  </button>
                 </div>
               </div>
             </div>
@@ -389,7 +296,10 @@ function goToAdmin() {
       </div>
       <aside class="col-md-4 mb-3">
         <div class="card text-center" style="margin-bottom: 1rem">
-          <div class="card-header">Punktacja<div class="scores-gear"><i @click="goToAdmin" class="bi bi-gear btn btn-light btn-xs icn-light-gray"></i></div></div>
+          <div class="card-header">Punktacja
+            <div class="scores-gear"><i @click="goToAdmin" class="bi bi-gear btn btn-light btn-xs icn-light-gray"></i>
+            </div>
+          </div>
           <div class="card-body">
             <ul class="list-group list-group-flush">
               <li v-for="player in game.players" class="list-group-item">
@@ -442,7 +352,7 @@ function goToAdmin() {
   --bs-btn-padding-y: 0rem;
 }
 
-.icn-light-gray{
+.icn-light-gray {
   color: #cccccc;
 }
 </style>
