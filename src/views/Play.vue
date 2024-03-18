@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {onBeforeRouteUpdate, useRoute} from "vue-router";
-import {computed, onMounted, ref, watch} from "vue";
+import {computed, onMounted, onUnmounted, ref, watch} from "vue";
 import GameService, {Bet, Game, Player, Task, TaskResult} from "../services/game.ts";
 import {v4 as uuidv4} from 'uuid';
 import {ToastProps, useToast} from "vue-toast-notification";
@@ -42,6 +42,7 @@ const currentPlayer = computed<Player>(() => game.value.players.find((it) => it.
 const bet = ref<Bet>(newBet())
 const didCurrentPlayerJoined = computed<boolean>(() => game.value.players.findIndex((it) => it.id === playerId.value) >= 0)
 const taskCompletion = ref<TaskResult>(TaskResult.UNDEFINED)
+var polling: NodeJS.Timeout
 
 watch(state, async (newValue, _) => {
   if (newValue !== 'TASK_EXECUTING' && newValue !== 'LOADING') {
@@ -53,7 +54,9 @@ async function init() {
   await fetchGame(gameId.value)
   bet.value = newBet()
   playerName.value = ''
-  setInterval(() => fetchGame(gameId.value), 5000); // poll Game every 5 seconds
+  if (gameId.value) {
+    polling = setInterval(() => fetchGame(gameId.value), 5000); // poll Game every 5 seconds
+  }
 }
 
 function newGame(): Game {
@@ -105,13 +108,7 @@ async function joinGame() {
   try {
     game.value = await GameService.joinGame(gameId.value, playerName.value, playerId.value) as Game
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      console.error(error.response);
-      toastError("?????")
-      // TODO: better error handling. use toastError
-    } else {
-      console.error(error);
-    }
+    handleApiError(error)
   }
 }
 
@@ -119,28 +116,15 @@ async function startGame() {
   try {
     game.value = await GameService.startGame(gameId.value) as Game
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      console.error(error.response);
-      // TODO: better error handling. use toastError
-    } else {
-      console.error(error);
-    }
+    handleApiError(error)
   }
 }
 
 async function betTask() {
-  if (!bet.value.result) {
-    // TODO Czy result może być nullem?
-  }
   try {
     game.value = await GameService.betTask(gameId.value, playerId.value, bet.value.amount, bet.value.result!) as Game
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      console.error(error.response);
-      // TODO: better error handling. use toastError
-    } else {
-      console.error(error);
-    }
+    handleApiError(error)
   }
 }
 
@@ -148,42 +132,27 @@ async function successTask() {
   try {
     game.value = await GameService.completeTask(gameId.value, playerId.value, 'YES') as Game
   } catch (error){
-    if (axios.isAxiosError(error)) {
-      console.error(error.response);
-      // TODO: better error handling. use toastError
-    } else {
-      console.error(error);
-    }
+    handleApiError(error)
   }
-  // FIXME async
   taskCompletion.value = TaskResult.YES
+  bet.value = newBet()
 }
 
 async function failTask() {
   try {
     game.value = await GameService.completeTask(gameId.value, playerId.value, 'NO') as Game
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      console.error(error.response);
-      // TODO: better error handling. use toastError
-    } else {
-      console.error(error);
-    }
+    handleApiError(error)
   }
-  // FIXME async
   taskCompletion.value = TaskResult.NO
+  bet.value = newBet()
 }
 
 async function redrawTask() {
   try {
     game.value = await GameService.drawTask(gameId.value) as Game
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      console.error(error.response);
-      // TODO: better error handling. use toastError
-    } else {
-      console.error(error);
-    }
+    handleApiError(error)
   }
 }
 
@@ -209,8 +178,23 @@ onMounted(async () => {
 
 })
 
+onUnmounted( () => {
+  if (polling) {
+    clearInterval(polling)
+  }
+})
+
 function goToAdmin() {
   routerPush('gameAdmin', {gameId: gameId.value})
+}
+
+function handleApiError(error: any) {
+  if (axios.isAxiosError(error) && error.response?.data?.message) {
+    toastError(`${error.response?.data?.message}`)
+  } else {
+    toastError(`${error.message}`)
+  }
+  console.error(error)
 }
 </script>
 
