@@ -303,6 +303,7 @@ function handleApiError(error: any) {
                   </button>
                 </div>
               </div>
+              <p v-if="taskCompletion !== TaskResult.UNDEFINED" style="color: darkorange">Poczekaj aż inny gracz potwierdzi resultat zadania.</p>
             </div>
             <div v-else-if="state === 'LOADING'">
               <div class="spinner-border" role="status">

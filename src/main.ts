@@ -8,6 +8,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css'
 import 'vue-toast-notification/dist/theme-bootstrap.css';
 import axios from "axios";
 import axiosRetry, {isIdempotentRequestError} from "axios-retry";
+import {axiosETAGCache} from "axios-etag-cache";
 
 axiosRetry(axios, {
     retries: 3, // number of retries
@@ -22,6 +23,8 @@ axiosRetry(axios, {
             || false;
     },
 })
+
+axiosETAGCache(axios);
 
 const app = createApp(App)
 app.use(router)

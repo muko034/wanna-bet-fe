@@ -3,6 +3,11 @@ dev
 ```shell
 npm run dev
 ```
+# Build
+```shell
+npm run build
+```
+
 
 
 -------------
