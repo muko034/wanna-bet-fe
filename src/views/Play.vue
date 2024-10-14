@@ -8,7 +8,7 @@ import {routerPush} from "../router.ts";
 import axios from "axios";
 import { useI18n } from 'vue-i18n'
 
-const { t, locale } = useI18n()
+const { locale } = useI18n()
 const route = useRoute()
 const gameId = computed<string>(() => route.params.gameId as string)
 const game = ref<Game>(newGame())
