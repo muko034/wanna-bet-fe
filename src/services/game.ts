@@ -7,8 +7,8 @@ const GameService = {
         return data
     },
 
-    async getGame(gameId: string) {
-        const {data} = await axios.get<Game>(`${CONFIG.API_URL}/games/${gameId}`)
+    async getGame(gameId: string, lang: string) {
+        const {data} = await axios.get<Game>(`${CONFIG.API_URL}/games/${gameId}?lang=${lang}`)
         return data
     },
 
