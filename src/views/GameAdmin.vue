@@ -4,7 +4,9 @@ import GameService, {Game} from "../services/game.ts";
 import {routerPush} from "../router.ts";
 import {computed, ref} from "vue";
 import {useRoute} from "vue-router";
+import { useI18n } from 'vue-i18n'
 
+const { t, locale } = useI18n()
 const route = useRoute()
 const gameId = computed<string>(() => route.params.gameId as string)
 const game = ref<Game>(newGame())
@@ -14,7 +16,7 @@ fetchGame(gameId.value)
 async function fetchGame(id: string) {
   // loading.value = true
   try {
-    game.value = await GameService.getGame(id) as Game
+    game.value = await GameService.getGame(id, locale.value) as Game
   } catch (error) {
     console.error('Failed to fetch game', error)
     await routerPush('notFound')

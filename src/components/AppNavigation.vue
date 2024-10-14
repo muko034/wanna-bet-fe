@@ -5,6 +5,7 @@ import type {RouteParams} from 'vue-router'
 import {AppRouteNames} from "../router.ts";
 import {useUserStore} from "../store/user.ts";
 import AppLink from "./AppLink.vue";
+import {useI18n} from "vue-i18n";
 
 interface NavLink {
   name: AppRouteNames
@@ -14,6 +15,7 @@ interface NavLink {
   display: 'all' | 'anonym' | 'authorized'
 }
 
+const { t } = useI18n()
 const {user} = storeToRefs(useUserStore())
 
 const username = computed(() => user.value?.username)
@@ -22,7 +24,7 @@ const displayStatus = computed(() => username.value ? 'authorized' : 'anonym')
 const allNavLinks = computed<NavLink[]>(() => [
   {
     name: 'join',
-    title: 'Dołącz',
+    title: t('navBar.join'),
     display: 'all',
   },
   // {
@@ -50,7 +52,7 @@ const navLinks = computed(() => allNavLinks.value.filter(
           class="navbar-brand"
           name="home"
       >
-        Założysz się?
+        {{ $t('navBar.title') }}
       </AppLink>
 
       <ul class="navbar-nav ml-auto">
@@ -72,9 +74,22 @@ const navLinks = computed(() => allNavLinks.value.filter(
             {{ link.title }}
           </AppLink>
         </li>
+        <li>
+          <div class="nav-link">
+            <label><i class="bi bi-translate"></i>&nbsp;</label>
+          <select v-model="$i18n.locale" class="localeDropdown">
+            <option value="pl">Polski</option>
+            <option value="en">English</option>
+          </select>
+          </div>
+        </li>
       </ul>
     </div>
   </nav>
 </template>
 
-
+<style scoped>
+.localeDropdown {
+  border-radius: 0.30rem;
+}
+</style>

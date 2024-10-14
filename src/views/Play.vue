@@ -6,8 +6,9 @@ import {v4 as uuidv4} from 'uuid';
 import {ToastProps, useToast} from "vue-toast-notification";
 import {routerPush} from "../router.ts";
 import axios from "axios";
+import { useI18n } from 'vue-i18n'
 
-
+const { t, locale } = useI18n()
 const route = useRoute()
 const gameId = computed<string>(() => route.params.gameId as string)
 const game = ref<Game>(newGame())
@@ -95,7 +96,7 @@ function toastError(message: string) {
 async function fetchGame(id: string) {
   // loading.value = true
   try {
-    game.value = await GameService.getGame(id) as Game
+    game.value = await GameService.getGame(id, locale.value) as Game
   } catch (error) {
     console.error('Failed to fetch game', error)
     await routerPush('notFound')
