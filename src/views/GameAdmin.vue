@@ -34,7 +34,7 @@ function newGame(): Game {
 }
 
 async function kickPlayerOut(playerId: string) {
-  await GameService.kickPlayerOut(gameId.value, playerId)
+  await GameService.kickPlayerOut(gameId.value, playerId, locale.value)
   await fetchGame(gameId.value)
 }
 

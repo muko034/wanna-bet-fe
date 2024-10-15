@@ -5,5 +5,46 @@
   },
   "home": {
     "newGame": "New game"
+  },
+  "play": {
+    "score": "Scoreboard",
+    "legend": {
+      "header": "Legend",
+      "activePlayer": "Player performing the task",
+      "bet": "The player has already placed a bet on the result",
+      "currentPlayer": "Current player (you)"
+    },
+    "state": {
+      "entered": "Join the game",
+      "betting": "Betting",
+      "joined": "Everyone ready?",
+      "taskExecution": "Show time"
+    },
+    "playerName": {
+      "label": "Name",
+      "placeholder": "Insert your name"
+    },
+    "join": "Join",
+    "startGame": "Start the game",
+    "physicalTask": "Physical task",
+    "mentalTask": "Mental task",
+    "waitForBet": "Wait until other players have finished betting",
+    "betInput": "How much are you betting?",
+    "willPlayerCompleteTask": "Will the player complete the task?",
+    "yes": "Yes",
+    "no": "No",
+    "changeBet": "Change",
+    "bet": "Bet",
+    "doesPlayerCompleteTask": "Did the player complete the task?",
+    "waitForTaskCompletionConfirmation": "Wait for another player to confirm the result of the task."
+  },
+  "admin": {
+    "players": "Players"
+  },
+  "notFound": {
+    "opps": "Opps!",
+    "pageNotFound": "Page not found.",
+    "pageDoesntExist": "The page you’re looking for doesn’t exist.",
+    "goHome": "Go Home"
   }
 }

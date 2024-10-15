@@ -1,81 +1,125 @@
-import axios from "axios";
+import axios, {RawAxiosRequestHeaders} from "axios";
 import {CONFIG} from "../config.ts";
 
 const GameService = {
-    async createGame() {
-        const {data} = await axios.post<Game>(`${CONFIG.API_URL}/games`)
+    async createGame(lang: string) {
+        const {data} = await axios.post<Game>(`${CONFIG.API_URL}/games`, null, {
+            headers: {
+                'Accept-Language': lang
+            } as RawAxiosRequestHeaders
+        })
         return data
     },
 
     async getGame(gameId: string, lang: string) {
-        const {data} = await axios.get<Game>(`${CONFIG.API_URL}/games/${gameId}?lang=${lang}`)
+        const {data} = await axios.get<Game>(`${CONFIG.API_URL}/games/${gameId}`, {
+            headers: {
+                'Accept-Language': lang
+            } as RawAxiosRequestHeaders
+        })
         return data
     },
 
-    async getGames() {
-        const {data} = await axios.get<Games>(`${CONFIG.API_URL}/games`)
+    async getGames(lang: string) {
+        const {data} = await axios.get<Games>(`${CONFIG.API_URL}/games`, {
+            headers: {
+                'Accept-Language': lang
+            } as RawAxiosRequestHeaders
+        })
         return data
     },
 
-    async kickPlayerOut(gameId: string, playerId: string) {
+    async kickPlayerOut(gameId: string, playerId: string, lang: string) {
         const {data} = await axios.post<{}>(
             `${CONFIG.API_URL}/games/${gameId}/actions/kick-out-player`,
-            {playerId: playerId}
-        )
-        return data
-    },
-
-    async joinGame(gameId: string, playerName: string, playerId: string) {
-        const {data} = await axios.post<{}>(
-            `${CONFIG.API_URL}/games/${gameId}/actions/join`,
             {
-                playerName: playerName,
                 playerId: playerId
+            },
+            {
+                headers: {
+                    'Accept-Language': lang
+                } as RawAxiosRequestHeaders
             }
         )
         return data
     },
 
-    async startGame(gameId: string) {
+    async joinGame(gameId: string, playerName: string, playerId: string, lang: string) {
         const {data} = await axios.post<{}>(
-            `${CONFIG.API_URL}/games/${gameId}/actions/start`
+            `${CONFIG.API_URL}/games/${gameId}/actions/join`,
+            {
+                playerName: playerName,
+                playerId: playerId
+            },
+            {
+                headers: {
+                    'Accept-Language': lang
+                } as RawAxiosRequestHeaders
+            }
         )
         return data
     },
 
-    async drawTask(gameId: string) {
+    async startGame(gameId: string, lang: string) {
         const {data} = await axios.post<{}>(
-            `${CONFIG.API_URL}/games/${gameId}/actions/draw-task`
+            `${CONFIG.API_URL}/games/${gameId}/actions/start`, null, {
+                headers: {
+                    'Accept-Language': lang
+                } as RawAxiosRequestHeaders
+            }
         )
         return data
     },
 
-    async betTask(gameId: string, playerId: string, amount: number, result: string) {
+    async drawTask(gameId: string, lang: string) {
+        const {data} = await axios.post<{}>(
+            `${CONFIG.API_URL}/games/${gameId}/actions/draw-task`, null, {
+                headers: {
+                    'Accept-Language': lang
+                } as RawAxiosRequestHeaders
+            }
+        )
+        return data
+    },
+
+    async betTask(gameId: string, playerId: string, amount: number, result: string, lang: string) {
         const {data} = await axios.post<{}>(
             `${CONFIG.API_URL}/games/${gameId}/actions/bet-task`,
             {
                 playerId: playerId,
                 amount: amount,
                 result: result,
+            }, {
+                headers: {
+                    'Accept-Language': lang
+                } as RawAxiosRequestHeaders
             }
         )
         return data
     },
 
-    async completeTask(gameId: string, playerId: string, taskResult: string) {
+    async completeTask(gameId: string, playerId: string, taskResult: string, lang: string) {
         const {data} = await axios.post<{}>(
             `${CONFIG.API_URL}/games/${gameId}/actions/complete-task`,
             {
                 playerId: playerId,
                 taskResult: taskResult,
+            }, {
+                headers: {
+                    'Accept-Language': lang
+                } as RawAxiosRequestHeaders
             }
         )
         return data
     },
 
-    async finishGame(gameId: string) {
+    async finishGame(gameId: string, lang: string) {
         const {data} = await axios.post<{}>(
-            `${CONFIG.API_URL}/games/${gameId}/actions/finish`
+            `${CONFIG.API_URL}/games/${gameId}/actions/finish`, null, {
+                headers: {
+                    'Accept-Language': lang
+                } as RawAxiosRequestHeaders
+            }
         )
         return data
     },

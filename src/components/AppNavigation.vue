@@ -16,7 +16,7 @@ interface NavLink {
 }
 
 const { t } = useI18n()
-const {user} = storeToRefs(useUserStore())
+const { user } = storeToRefs(useUserStore())
 
 const username = computed(() => user.value?.username)
 const displayStatus = computed(() => username.value ? 'authorized' : 'anonym')
@@ -30,7 +30,7 @@ const allNavLinks = computed<NavLink[]>(() => [
   // {
   //   name: 'login',
   //   title: 'Sign in',
-  //   display: 'anonym',
+  //   display: 'all',
   // },
   {
     name: 'admin',
@@ -52,9 +52,9 @@ const navLinks = computed(() => allNavLinks.value.filter(
           class="navbar-brand"
           name="home"
       >
-        {{ $t('navBar.title') }}
+        {{ t('navBar.title') }}
       </AppLink>
-
+      <div class="navbar" id="navbarSupportedContent">
       <ul class="navbar-nav ml-auto">
         <li
             v-for="link in navLinks"
@@ -74,7 +74,8 @@ const navLinks = computed(() => allNavLinks.value.filter(
             {{ link.title }}
           </AppLink>
         </li>
-        <li>
+      </ul>
+      </div>
           <div class="nav-link">
             <label><i class="bi bi-translate"></i>&nbsp;</label>
           <select v-model="$i18n.locale" class="localeDropdown">
@@ -82,8 +83,6 @@ const navLinks = computed(() => allNavLinks.value.filter(
             <option value="en">English</option>
           </select>
           </div>
-        </li>
-      </ul>
     </div>
   </nav>
 </template>

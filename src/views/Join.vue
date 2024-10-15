@@ -4,12 +4,14 @@ import {ref} from "vue";
 import TimeAgo from 'javascript-time-ago'
 import pl from 'javascript-time-ago/locale/pl'
 import AppLink from "../components/AppLink.vue";
+import {useI18n} from "vue-i18n";
 
+const { locale } = useI18n()
 const games = ref<Games>({
   content: [],
   hasMore: false
 })
-GameService.getGames().then(res => {
+GameService.getGames(locale.value).then(res => {
   games.value = res as Games
 })
 

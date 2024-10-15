@@ -8,7 +8,7 @@ import {routerPush} from "../router.ts";
 import axios from "axios";
 import { useI18n } from 'vue-i18n'
 
-const { locale } = useI18n()
+const { t, locale } = useI18n()
 const route = useRoute()
 const gameId = computed<string>(() => route.params.gameId as string)
 const game = ref<Game>(newGame())
@@ -49,6 +49,10 @@ watch(state, async (newValue, _) => {
   if (newValue !== 'TASK_EXECUTING' && newValue !== 'LOADING') {
     taskCompletion.value = TaskResult.UNDEFINED
   }
+})
+
+watch(locale, async () => {
+  await fetchGame(gameId.value)
 })
 
 async function init() {
@@ -107,7 +111,7 @@ async function fetchGame(id: string) {
 
 async function joinGame() {
   try {
-    game.value = await GameService.joinGame(gameId.value, playerName.value, playerId.value) as Game
+    game.value = await GameService.joinGame(gameId.value, playerName.value, playerId.value, locale.value) as Game
   } catch (error) {
     handleApiError(error)
   }
@@ -115,7 +119,7 @@ async function joinGame() {
 
 async function startGame() {
   try {
-    game.value = await GameService.startGame(gameId.value) as Game
+    game.value = await GameService.startGame(gameId.value, locale.value) as Game
   } catch (error) {
     handleApiError(error)
   }
@@ -123,7 +127,7 @@ async function startGame() {
 
 async function betTask() {
   try {
-    game.value = await GameService.betTask(gameId.value, playerId.value, bet.value.amount, bet.value.result!) as Game
+    game.value = await GameService.betTask(gameId.value, playerId.value, bet.value.amount, bet.value.result!, locale.value) as Game
   } catch (error) {
     handleApiError(error)
   }
@@ -131,7 +135,7 @@ async function betTask() {
 
 async function successTask() {
   try {
-    game.value = await GameService.completeTask(gameId.value, playerId.value, 'YES') as Game
+    game.value = await GameService.completeTask(gameId.value, playerId.value, 'YES', locale.value) as Game
   } catch (error){
     handleApiError(error)
   }
@@ -141,7 +145,7 @@ async function successTask() {
 
 async function failTask() {
   try {
-    game.value = await GameService.completeTask(gameId.value, playerId.value, 'NO') as Game
+    game.value = await GameService.completeTask(gameId.value, playerId.value, 'NO', locale.value) as Game
   } catch (error) {
     handleApiError(error)
   }
@@ -151,7 +155,7 @@ async function failTask() {
 
 async function redrawTask() {
   try {
-    game.value = await GameService.drawTask(gameId.value) as Game
+    game.value = await GameService.drawTask(gameId.value, locale.value) as Game
   } catch (error) {
     handleApiError(error)
   }
@@ -205,20 +209,20 @@ function handleApiError(error: any) {
       <div class="col-md-8 mb-3">
         <div class="card text-center" style="min-height: 20rem;">
           <div class="card-header">
-            <h2 v-if="state === 'ENTERED'">Dołącz do gry</h2>
-            <h2 v-else-if="state === 'BETTING'">Obstawianie</h2>
-            <h2 v-else-if="state === 'JOINED'">Wszyscy gotowi?</h2>
-            <h2 v-else-if="state === 'TASK_EXECUTING'">Czas próby</h2>
+            <h2 v-if="state === 'ENTERED'">{{ t('play.state.entered') }}</h2>
+            <h2 v-else-if="state === 'BETTING'">{{ t('play.state.betting') }}</h2>
+            <h2 v-else-if="state === 'JOINED'">{{ t('play.state.joined') }}</h2>
+            <h2 v-else-if="state === 'TASK_EXECUTING'">{{ t('play.state.taskExecution') }}</h2>
             <h2 v-else>[{{ gameId }}]</h2>
           </div>
           <div class="card-body">
             <div v-if="state === 'ENTERED'" id="join">
               <div class="mb-3">
-                <label for="playerNameInput" class="form-label text-left">Imię</label>
+                <label for="playerNameInput" class="form-label text-left">{{ t('play.playerName.label') }}</label>
                 <input v-model="playerName" type="text" class="form-control" id="playerNameInput"
-                       placeholder="Wprowadź twoje imię">
+                       v-bind:placeholder="t('play.playerName.placeholder')">
               </div>
-              <button @click="joinGame" type="submit" class="btn btn-primary">Dołącz</button>
+              <button @click="joinGame" type="submit" class="btn btn-primary">{{ t('play.join') }}</button>
             </div>
             <div v-else-if="state === 'JOINED'">
               <button
@@ -226,20 +230,20 @@ function handleApiError(error: any) {
                   @click="startGame"
                   type="submit"
                   class="btn btn-primary">
-                Rozpocznij grę
+                {{ t('play.startGame') }}
               </button>
             </div>
             <div v-else-if="state === 'BETTING'" class="d-flex flex-column justify-content-center align-items-center">
               <div class="card text-center" style="max-width: 20rem; min-height: 20rem; margin-bottom: 20px">
                 <div v-if="task.type == 'PHYSICAL'" class="card-header">
-                  Zadanie zręcznościowe <i
+                  {{ t('play.physicalTask') }} <i
                     v-if="task.timeLimit !== 'NONE'"
                     :class="task.timeLimit === 'QUARTER_MINUTE'
                     ? 'bi bi-hourglass-split icon-yellow'
                     : (task.timeLimit === 'HALF_MINUTE' ? 'bi bi-hourglass-split icon-red': 'bi bi-hourglass-split')"></i>
                 </div>
                 <div v-else class="card-header">
-                  Zadanie umysłowe <i
+                  {{ t('play.mentalTask') }} <i
                     v-if="task.timeLimit !== 'NONE'"
                     :class="task.timeLimit === 'QUARTER_MINUTE'
                     ? 'bi bi-hourglass-split icon-yellow'
@@ -247,7 +251,7 @@ function handleApiError(error: any) {
                 </div>
                 <div class="card-body">
                   <p v-if="!currentPlayer.isActive" class="card-text">{{ task.content }}</p>
-                  <p v-else class="card-text">Poczekaj aż inni gracze skończą obstawiać</p>
+                  <p v-else class="card-text">{{ t('play.waitForBet') }}</p>
                 </div>
                 <div>
                   <button @click="redrawTask" type="button" class="btn btn-light btn-sm">
@@ -256,7 +260,7 @@ function handleApiError(error: any) {
                 </div>
               </div>
               <div v-if="!currentPlayer.isActive">
-                <label for="amountInput" class="form-label">Ile obstawiasz? {{ bet.amount }}</label>
+                <label for="amountInput" class="form-label">{{ t('play.betInput') }} {{ bet.amount }}</label>
                 <input v-model="bet.amount" type="range" class="form-range" id="amountInput" min="1"
                        :max="Math.floor(currentPlayer.points / 2)"
                        @input="(event: Event) => {
@@ -264,47 +268,47 @@ function handleApiError(error: any) {
          const target = inputEvent.target as HTMLInputElement;
          bet.amount = parseInt(target?.value);
        }">
-                <p>Czy gracz wykona zadanie?</p>
+                <p>{{ t('play.willPlayerCompleteTask') }}</p>
                 <div class="form-check form-check-inline">
                   <input v-model="bet.result" value="YES" class="form-check-input" type="radio"
                          name="inlineRadioOptions"
                          id="yesBetOption">
-                  <label class="form-check-label" for="yesBetOption">Tak</label>
+                  <label class="form-check-label" for="yesBetOption">{{ t('play.yes') }}</label>
                 </div>
                 <div class="form-check form-check-inline">
                   <input v-model="bet.result" value="NO" class="form-check-input" type="radio" name="inlineRadioOptions"
                          id="noBetOption">
-                  <label class="form-check-label" for="noBetOption">Nie</label>
+                  <label class="form-check-label" for="noBetOption">{{ t('play.no') }}</label>
                 </div>
                 <button :disabled="!bet.result" @click="betTask" type="submit" class="btn btn-primary">
-                  {{ currentPlayer.didBet ? 'Zmień' : 'Obstaw' }}
+                  {{ currentPlayer.didBet ? t('play.changeBet') : t('play.bet') }}
                 </button>
               </div>
               <div v-if="currentPlayer.isActive">
-                <p>Poczekaj aż inni gracze skończą obstawiać</p>
+                <p>{{ t('play.waitForBet') }}</p>
               </div>
             </div>
             <div v-else-if="state === 'TASK_EXECUTING'"
                  class="d-flex flex-column justify-content-center align-items-center">
               <div class="card text-center" style="max-width: 20rem; min-height: 20rem; margin-bottom: 20px">
-                <div class="card-header">Zadanie {{ task.type == 'PHYSICAL' ? 'ZRĘCZNOŚCIOWE' : 'UMYSŁOWE' }}</div>
+                <div class="card-header">{{ task.type == 'PHYSICAL' ? t('play.physicalTask') : t('play.mentalTask') }}</div>
                 <div class="card-body">
                   <p v-if="!currentPlayer.isActive || task.type == 'PHYSICAL'" class="card-text">{{ task.content }}</p>
-                  <p v-else class="card-text">Poczekaj aż inni gracze skończą obstawiać</p>
+                  <p v-else class="card-text">{{ t('play.waitForBet') }}</p>
                 </div>
               </div>
-              <p>Czy gracz wykonał zadanie?</p>
+              <p>{{ t('play.doesPlayerCompleteTask') }}</p>
               <div class="row">
                 <div class="btn-group" role="group" aria-label="Basic example">
                   <button @click="successTask" type="submit" class="btn btn-success"
-                          :disabled="taskCompletion == TaskResult.YES">Tak
+                          :disabled="taskCompletion == TaskResult.YES">{{ t('play.yes') }}
                   </button>
                   <button @click="failTask" type="submit" class="btn btn-danger"
-                          :disabled="taskCompletion == TaskResult.NO">Nie
+                          :disabled="taskCompletion == TaskResult.NO">{{ t('play.no') }}
                   </button>
                 </div>
               </div>
-              <p v-if="taskCompletion !== TaskResult.UNDEFINED" style="color: darkorange">Poczekaj aż inny gracz potwierdzi resultat zadania.</p>
+              <p v-if="taskCompletion !== TaskResult.UNDEFINED" style="color: darkorange">{{ t('play.waitForTaskCompletionConfirmation') }}</p>
             </div>
             <div v-else-if="state === 'LOADING'">
               <div class="spinner-border" role="status">
@@ -316,7 +320,7 @@ function handleApiError(error: any) {
       </div>
       <aside class="col-md-4 mb-3">
         <div class="card text-center" style="margin-bottom: 1rem">
-          <div class="card-header">Punktacja
+          <div class="card-header">{{ t('play.score')}}
             <div class="scores-gear"><i @click="goToAdmin" class="bi bi-gear btn btn-light btn-xs icn-light-gray"></i>
             </div>
           </div>
@@ -333,17 +337,17 @@ function handleApiError(error: any) {
           </div>
         </div>
         <div class="card text-center">
-          <div class="card-header">Legenda</div>
+          <div class="card-header">{{ t('play.legend.header') }}</div>
           <div class="card-body">
             <ul class="list-group list-group-flush">
               <li class="list-group-item">
-                <i class="bi bi-star-fill"></i><span> - Gracz wykonujący zadanie</span>
+                <i class="bi bi-star-fill"></i><span> - {{ t('play.legend.activePlayer') }}</span>
               </li>
               <li class="list-group-item">
-                <i class="bi bi-coin"></i><span> - Gracz obstawił już wynik</span>
+                <i class="bi bi-coin"></i><span> - {{ t('play.legend.bet') }}</span>
               </li>
               <li class="list-group-item">
-                <span class="fw-bold">Obecny gracz (ty)</span>
+                <span class="fw-bold">{{ t('play.legend.currentPlayer') }}</span>
               </li>
             </ul>
           </div>

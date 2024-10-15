@@ -5,5 +5,46 @@
   },
   "home": {
     "newGame": "Nowa gra"
+  },
+  "play": {
+    "score": "Punktacja",
+    "legend": {
+      "header": "Legenda",
+      "activePlayer": "Gracz wykonujący zadanie",
+      "bet": "Gracz obstawił już wynik",
+      "currentPlayer": "Obecny gracz (ty)"
+    },
+    "state": {
+      "entered": "Dołącz do gry",
+      "betting": "Obstawianie",
+      "joined": "Wszyscy gotowi?",
+      "taskExecution": "Czas próby"
+    },
+    "playerName": {
+      "label": "Imię",
+      "placeholder": "Wprowadź twoje imię"
+    },
+    "join": "Dołącz",
+    "startGame": "Rozpocznij grę",
+    "physicalTask": "Zadanie zręcznościowe",
+    "mentalTask": "Zadanie umysłowe",
+    "waitForBet": "Poczekaj aż inni gracze skończą obstawiać",
+    "betInput": "Ile obstawiasz?",
+    "willPlayerCompleteTask": "Czy gracz wykona zadanie?",
+    "yes": "Tak",
+    "no": "Nie",
+    "changeBet": "Zmień",
+    "bet": "Obstaw",
+    "doesPlayerCompleteTask": "Czy gracz wykonał zadanie?",
+    "waitForTaskCompletionConfirmation": "Poczekaj aż inny gracz potwierdzi rezultat zadania."
+  },
+  "admin": {
+    "players": "Gracze"
+  },
+  "notFound": {
+    "opps": "Ups!",
+    "pageNotFound": "Nie odnaleziono strony.",
+    "pageDoesntExist": "Strona, której szukasz, nie istnieje.",
+    "goHome": "Wróć do strony startowej"
   }
 }
