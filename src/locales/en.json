@@ -22,7 +22,8 @@
     },
     "playerName": {
       "label": "Name",
-      "placeholder": "Insert your name"
+      "placeholder": "Insert your name",
+      "invalidFeedback": "Name must be between 3 and 20 characters."
     },
     "join": "Join",
     "startGame": "Start the game",
@@ -39,7 +40,8 @@
     "waitForTaskCompletionConfirmation": "Wait for another player to confirm the result of the task."
   },
   "admin": {
-    "players": "Players"
+    "players": "Players",
+    "goBack": "Go back"
   },
   "notFound": {
     "opps": "Opps!",

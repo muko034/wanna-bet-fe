@@ -124,6 +124,21 @@ const GameService = {
         return data
     },
 
+    async changePlayerPoints(gameId: string, playerId: string, points: number, lang: string) {
+        const {data} = await axios.post<{}>(
+            `${CONFIG.API_URL}/games/${gameId}/actions/change-player-points`,
+            {
+                playerId: playerId,
+                points: points,
+            }, {
+                headers: {
+                    'Accept-Language': lang
+                } as RawAxiosRequestHeaders
+            }
+        )
+        return data
+    },
+
 }
 
 export interface Games {

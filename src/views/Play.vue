@@ -219,10 +219,27 @@ function handleApiError(error: any) {
             <div v-if="state === 'ENTERED'" id="join">
               <div class="mb-3">
                 <label for="playerNameInput" class="form-label text-left">{{ t('play.playerName.label') }}</label>
-                <input v-model="playerName" type="text" class="form-control" id="playerNameInput"
-                       v-bind:placeholder="t('play.playerName.placeholder')">
+                <input
+                    v-model="playerName"
+                    type="text"
+                    class="form-control"
+                    id="playerNameInput"
+                    minlength="3"
+                    maxlength="20"
+                    :class="{ 'is-invalid': playerName.length > 0 && (playerName.length < 3 || playerName.length > 20) }"
+                    v-bind:placeholder="t('play.playerName.placeholder')">
+                <div v-if="playerName.length > 0 && (playerName.length < 3 || playerName.length > 20)" class="invalid-feedback">
+                  {{ t('play.playerName.invalidFeedback') }}
+                </div>
               </div>
-              <button @click="joinGame" type="submit" class="btn btn-primary">{{ t('play.join') }}</button>
+              <button
+                  @click="joinGame"
+                  type="submit"
+                  class="btn btn-primary"
+                  :disabled="playerName.length < 3 || playerName.length > 20"
+              >
+                {{ t('play.join') }}
+              </button>
             </div>
             <div v-else-if="state === 'JOINED'">
               <button
@@ -377,6 +394,7 @@ function handleApiError(error: any) {
 }
 
 .icn-light-gray {
-  color: #cccccc;
+  color: #acacac;
+  opacity: 20%;
 }
 </style>

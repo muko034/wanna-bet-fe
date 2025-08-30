@@ -22,7 +22,8 @@
     },
     "playerName": {
       "label": "Imię",
-      "placeholder": "Wprowadź twoje imię"
+      "placeholder": "Wprowadź twoje imię",
+      "invalidFeedback": "Imię musi mieć od 3 do 20 znaków."
     },
     "join": "Dołącz",
     "startGame": "Rozpocznij grę",
@@ -39,7 +40,8 @@
     "waitForTaskCompletionConfirmation": "Poczekaj aż inny gracz potwierdzi rezultat zadania."
   },
   "admin": {
-    "players": "Gracze"
+    "players": "Gracze",
+    "goBack": "Wróć do gry"
   },
   "notFound": {
     "opps": "Ups!",
