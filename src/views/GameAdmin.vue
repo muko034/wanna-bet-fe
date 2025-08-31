@@ -38,7 +38,11 @@ async function kickPlayerOut(playerId: string) {
   game.value = await GameService.kickPlayerOut(gameId.value, playerId, locale.value)
 }
 
-function onPointsInput(playerId: string, newPoints: number) {
+function onPointsInput(playerId: string, event: Event) {
+  const target = event.target as HTMLInputElement | null;
+  if (!target) return;
+  const newPoints = Number(target.value);
+
   if (debounceTimeouts.value[playerId]) {
     clearTimeout(debounceTimeouts.value[playerId]);
   }
@@ -49,7 +53,7 @@ function onPointsInput(playerId: string, newPoints: number) {
 }
 
 function goBack() {
-  routerPush('play', {gameId: game.id})
+  routerPush('play', {gameId: gameId.value})
 }
 
 </script>
@@ -76,7 +80,7 @@ function goBack() {
                 <input
                     type="number"
                     :value="player.points"
-                    @input="onPointsInput(player.id, Number($event.target.value))"
+                    @input="onPointsInput(player.id, $event)"
                     class="form-control ms-2 me-2"
                 />
                 <i @click="kickPlayerOut(player.id)" class="bi bi-trash3-fill bi-btn ms-auto"></i>

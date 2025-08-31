@@ -135,7 +135,7 @@ async function betTask() {
 
 async function successTask() {
   try {
-    game.value = await GameService.completeTask(gameId.value, playerId.value, 'YES', locale.value) as Game
+    game.value = await GameService.completeTask(gameId.value, playerId.value, 'YES', locale.value)
   } catch (error){
     handleApiError(error)
   }
@@ -145,7 +145,7 @@ async function successTask() {
 
 async function failTask() {
   try {
-    game.value = await GameService.completeTask(gameId.value, playerId.value, 'NO', locale.value) as Game
+    game.value = await GameService.completeTask(gameId.value, playerId.value, 'NO', locale.value)
   } catch (error) {
     handleApiError(error)
   }
@@ -155,7 +155,7 @@ async function failTask() {
 
 async function redrawTask() {
   try {
-    game.value = await GameService.drawTask(gameId.value, locale.value) as Game
+    game.value = await GameService.drawTask(gameId.value, locale.value)
   } catch (error) {
     handleApiError(error)
   }

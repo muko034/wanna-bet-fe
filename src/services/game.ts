@@ -30,7 +30,7 @@ const GameService = {
     },
 
     async kickPlayerOut(gameId: string, playerId: string, lang: string) {
-        const {data} = await axios.post<{}>(
+        const {data} = await axios.post<Game>(
             `${CONFIG.API_URL}/games/${gameId}/actions/kick-out-player`,
             {
                 playerId: playerId
@@ -45,7 +45,7 @@ const GameService = {
     },
 
     async joinGame(gameId: string, playerName: string, playerId: string, lang: string) {
-        const {data} = await axios.post<{}>(
+        const {data} = await axios.post<Game>(
             `${CONFIG.API_URL}/games/${gameId}/actions/join`,
             {
                 playerName: playerName,
@@ -61,7 +61,7 @@ const GameService = {
     },
 
     async startGame(gameId: string, lang: string) {
-        const {data} = await axios.post<{}>(
+        const {data} = await axios.post<Game>(
             `${CONFIG.API_URL}/games/${gameId}/actions/start`, null, {
                 headers: {
                     'Accept-Language': lang
@@ -72,7 +72,7 @@ const GameService = {
     },
 
     async drawTask(gameId: string, lang: string) {
-        const {data} = await axios.post<{}>(
+        const {data} = await axios.post<Game>(
             `${CONFIG.API_URL}/games/${gameId}/actions/draw-task`, null, {
                 headers: {
                     'Accept-Language': lang
@@ -83,7 +83,7 @@ const GameService = {
     },
 
     async betTask(gameId: string, playerId: string, amount: number, result: string, lang: string) {
-        const {data} = await axios.post<{}>(
+        const {data} = await axios.post<Game>(
             `${CONFIG.API_URL}/games/${gameId}/actions/bet-task`,
             {
                 playerId: playerId,
@@ -99,7 +99,7 @@ const GameService = {
     },
 
     async completeTask(gameId: string, playerId: string, taskResult: string, lang: string) {
-        const {data} = await axios.post<{}>(
+        const {data} = await axios.post<Game>(
             `${CONFIG.API_URL}/games/${gameId}/actions/complete-task`,
             {
                 playerId: playerId,
@@ -114,7 +114,7 @@ const GameService = {
     },
 
     async finishGame(gameId: string, lang: string) {
-        const {data} = await axios.post<{}>(
+        const {data} = await axios.post<Game>(
             `${CONFIG.API_URL}/games/${gameId}/actions/finish`, null, {
                 headers: {
                     'Accept-Language': lang
@@ -125,7 +125,7 @@ const GameService = {
     },
 
     async changePlayerPoints(gameId: string, playerId: string, points: number, lang: string) {
-        const {data} = await axios.post<{}>(
+        const {data} = await axios.post<Game>(
             `${CONFIG.API_URL}/games/${gameId}/actions/change-player-points`,
             {
                 playerId: playerId,
