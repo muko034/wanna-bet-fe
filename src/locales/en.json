@@ -37,7 +37,10 @@
     "changeBet": "Change",
     "bet": "Bet",
     "doesPlayerCompleteTask": "Did the player complete the task?",
-    "waitForTaskCompletionConfirmation": "Wait for another player to confirm the result of the task."
+    "waitForTaskCompletionConfirmation": "Wait for another player to confirm the result of the task.",
+    "redrawQuestion-1": "Player ",
+    "redrawQuestion-2": " wants to redraw a new task, do you agree?",
+    "waitForRedrawConfirmation": "Wait for another player to confirm the task change?"
   },
   "admin": {
     "players": "Players",

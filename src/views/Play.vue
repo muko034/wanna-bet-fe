@@ -43,6 +43,7 @@ const currentPlayer = computed<Player>(() => game.value.players.find((it) => it.
 const bet = ref<Bet>(newBet())
 const didCurrentPlayerJoined = computed<boolean>(() => game.value.players.findIndex((it) => it.id === playerId.value) >= 0)
 const taskCompletion = ref<TaskResult>(TaskResult.UNDEFINED)
+const showRedrawConfirm = computed<boolean>(() => game.value.redrawPoll && game.value.redrawPoll !== playerId.value)
 var polling: NodeJS.Timeout
 
 watch(state, async (newValue, _) => {
@@ -155,7 +156,17 @@ async function failTask() {
 
 async function redrawTask() {
   try {
-    game.value = await GameService.drawTask(gameId.value, locale.value)
+    game.value = await GameService.drawTask(gameId.value, playerId.value, true, locale.value)
+    game.value.redrawPoll = playerId.value
+  } catch (error) {
+    handleApiError(error)
+  }
+}
+
+async function handleRedrawConfirm(result: boolean) {
+  try {
+    game.value = await GameService.drawTask(gameId.value, playerId.value, result, locale.value)
+    game.value.redrawPoll = undefined
   } catch (error) {
     handleApiError(error)
   }
@@ -270,10 +281,24 @@ function handleApiError(error: any) {
                   <p v-if="!currentPlayer.isActive" class="card-text">{{ task.content }}</p>
                   <p v-else class="card-text">{{ t('play.waitForBet') }}</p>
                 </div>
-                <div>
-                  <button @click="redrawTask" type="button" class="btn btn-light btn-sm">
-                    <span class="bi bi-shuffle" style="color: rgb(128,128,128)"></span>
-                  </button>
+                <div class="card-footer" :class="showRedrawConfirm ? 'redraw-confirm' : ''">
+                  <template v-if="showRedrawConfirm">
+                    <div class="redraw-confirm-box p-0">
+                      <p class="mb-1">{{ t('play.redrawQuestion-1') }}{{ currentPlayer.name }}{{ t('play.redrawQuestion-2') }}</p>
+                      <button class="btn btn-success btn-sm me-1" @click="handleRedrawConfirm(true)">{{ t('play.yes') }}</button>
+                      <button class="btn btn-danger btn-sm" @click="handleRedrawConfirm(false)">{{ t('play.no') }}</button>
+                    </div>
+                  </template>
+                  <template v-else-if="!showRedrawConfirm && game.redrawPoll === currentPlayer.id">
+                    <div class="redraw-confirm-box p-0">
+                      <p class="mb-1">{{ t('play.waitForRedrawConfirmation') }}</p>
+                    </div>
+                  </template>
+                  <template v-else>
+                    <button @click="redrawTask" type="button" class="btn btn-light btn-sm">
+                      <span class="bi bi-shuffle" style="color: rgb(128,128,128)"></span>
+                    </button>
+                  </template>
                 </div>
               </div>
               <div v-if="!currentPlayer.isActive">
@@ -397,4 +422,18 @@ function handleApiError(error: any) {
   color: #acacac;
   opacity: 20%;
 }
+
+.card-footer {
+  padding-top: 0.4rem;
+  padding-bottom: 0.4rem;
+  font-size: 0.9rem;
+  border: none;
+  background-color: #fff;
+}
+
+.redraw-confirm {
+  background-color: #ffe7b2;
+  border: 1px solid;
+}
+
 </style>

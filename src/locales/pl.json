@@ -37,7 +37,10 @@
     "changeBet": "Zmień",
     "bet": "Obstaw",
     "doesPlayerCompleteTask": "Czy gracz wykonał zadanie?",
-    "waitForTaskCompletionConfirmation": "Poczekaj aż inny gracz potwierdzi rezultat zadania."
+    "waitForTaskCompletionConfirmation": "Poczekaj aż inny gracz potwierdzi rezultat zadania.",
+    "redrawQuestion-1": "Gracz ",
+    "redrawQuestion-2": " chce wylosować nowe zadanie, czy się zgadzasz?",
+    "waitForRedrawConfirmation": "Poczekaj aż inny gracz potwierdzi zmianę zadania?"
   },
   "admin": {
     "players": "Gracze",

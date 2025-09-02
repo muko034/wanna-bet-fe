@@ -71,9 +71,14 @@ const GameService = {
         return data
     },
 
-    async drawTask(gameId: string, lang: string) {
+    async drawTask(gameId: string, playerId: string, confirms: boolean, lang: string) {
         const {data} = await axios.post<Game>(
-            `${CONFIG.API_URL}/games/${gameId}/actions/draw-task`, null, {
+            `${CONFIG.API_URL}/games/${gameId}/actions/draw-task`,
+            {
+                playerId: playerId,
+                confirms: confirms
+            },
+            {
                 headers: {
                     'Accept-Language': lang
                 } as RawAxiosRequestHeaders
@@ -157,7 +162,8 @@ export interface Game {
     id: string,
     status: string,
     players: Array<Player>,
-    task?: Task
+    task?: Task,
+    redrawPoll: string
 }
 
 export interface Player {
