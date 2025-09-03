@@ -163,7 +163,7 @@ export interface Game {
     status: string,
     players: Array<Player>,
     task?: Task,
-    redrawPoll: string
+    redrawPoll?: string
 }
 
 export interface Player {

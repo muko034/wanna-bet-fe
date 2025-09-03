@@ -43,7 +43,7 @@ const currentPlayer = computed<Player>(() => game.value.players.find((it) => it.
 const bet = ref<Bet>(newBet())
 const didCurrentPlayerJoined = computed<boolean>(() => game.value.players.findIndex((it) => it.id === playerId.value) >= 0)
 const taskCompletion = ref<TaskResult>(TaskResult.UNDEFINED)
-const showRedrawConfirm = computed<boolean>(() => game.value.redrawPoll && game.value.redrawPoll !== playerId.value)
+const showRedrawConfirm = computed<boolean>(() => !!game.value.redrawPoll && game.value.redrawPoll !== playerId.value)
 var polling: NodeJS.Timeout
 
 watch(state, async (newValue, _) => {
