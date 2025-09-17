@@ -156,7 +156,7 @@ async function failTask() {
 
 async function redrawTask() {
   try {
-    game.value = await GameService.drawTask(gameId.value, playerId.value, true, null, locale.value)
+    game.value = await GameService.drawTask(gameId.value, playerId.value, locale.value)
     game.value.redrawPoll = {
       author: playerId.value,
     }
@@ -167,7 +167,7 @@ async function redrawTask() {
 
 async function handleRedrawConfirm(result: boolean) {
   try {
-    game.value = await GameService.drawTask(gameId.value, playerId.value, result, game.value.redrawPoll?.id, locale.value)
+    game.value = await GameService.confirmDrawTask(gameId.value, playerId.value, result, game.value.redrawPoll?.id, locale.value)
     game.value.redrawPoll = undefined
   } catch (error) {
     handleApiError(error)
