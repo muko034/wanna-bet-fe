@@ -43,7 +43,7 @@ const currentPlayer = computed<Player>(() => game.value.players.find((it) => it.
 const bet = ref<Bet>(newBet())
 const didCurrentPlayerJoined = computed<boolean>(() => game.value.players.findIndex((it) => it.id === playerId.value) >= 0)
 const taskCompletion = ref<TaskResult>(TaskResult.UNDEFINED)
-const showRedrawConfirm = computed<boolean>(() => !!game.value.redrawPoll && game.value.redrawPoll !== playerId.value)
+const showRedrawConfirm = computed<boolean>(() => !!game.value.redrawPoll && game.value.redrawPoll.author !== playerId.value)
 var polling: NodeJS.Timeout
 
 watch(state, async (newValue, _) => {
@@ -156,8 +156,10 @@ async function failTask() {
 
 async function redrawTask() {
   try {
-    game.value = await GameService.drawTask(gameId.value, playerId.value, true, locale.value)
-    game.value.redrawPoll = playerId.value
+    game.value = await GameService.drawTask(gameId.value, playerId.value, true, null, locale.value)
+    game.value.redrawPoll = {
+      author: playerId.value,
+    }
   } catch (error) {
     handleApiError(error)
   }
@@ -165,7 +167,7 @@ async function redrawTask() {
 
 async function handleRedrawConfirm(result: boolean) {
   try {
-    game.value = await GameService.drawTask(gameId.value, playerId.value, result, locale.value)
+    game.value = await GameService.drawTask(gameId.value, playerId.value, result, game.value.redrawPoll?.id, locale.value)
     game.value.redrawPoll = undefined
   } catch (error) {
     handleApiError(error)
@@ -289,7 +291,7 @@ function handleApiError(error: any) {
                       <button class="btn btn-danger btn-sm" @click="handleRedrawConfirm(false)">{{ t('play.no') }}</button>
                     </div>
                   </template>
-                  <template v-else-if="!showRedrawConfirm && game.redrawPoll === currentPlayer.id">
+                  <template v-else-if="!showRedrawConfirm && game.redrawPoll?.author === currentPlayer.id">
                     <div class="redraw-confirm-box p-0">
                       <p class="mb-1">{{ t('play.waitForRedrawConfirmation') }}</p>
                     </div>

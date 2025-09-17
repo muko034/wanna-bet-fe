@@ -71,12 +71,13 @@ const GameService = {
         return data
     },
 
-    async drawTask(gameId: string, playerId: string, confirms: boolean, lang: string) {
+    async drawTask(gameId: string, playerId: string, confirms: boolean, pollId?: string, lang: string) {
         const {data} = await axios.post<Game>(
             `${CONFIG.API_URL}/games/${gameId}/actions/draw-task`,
             {
                 playerId: playerId,
-                confirms: confirms
+                confirms: confirms,
+                pollId: pollId
             },
             {
                 headers: {
@@ -163,7 +164,12 @@ export interface Game {
     status: string,
     players: Array<Player>,
     task?: Task,
-    redrawPoll?: string
+    redrawPoll?: RedrawPoll
+}
+
+export interface RedrawPoll {
+    id: string,
+    author: string
 }
 
 export interface Player {
